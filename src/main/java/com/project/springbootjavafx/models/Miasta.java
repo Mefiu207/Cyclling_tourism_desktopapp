@@ -14,4 +14,7 @@ public class Miasta {
     @Id
     private String miasto;
 
+    public String toString(){
+        return miasto;
+    }
 }

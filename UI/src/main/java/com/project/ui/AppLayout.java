@@ -6,7 +6,19 @@ import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
+import org.springframework.boot.SpringApplication;
+import org.springframework.context.ConfigurableApplicationContext;
+
+
+
 public class AppLayout extends Application {
+
+    private ConfigurableApplicationContext context;
+
+    @Override
+    public void init() throws Exception {
+        context = SpringApplication.run(SpringBootConfig.class);
+    }
 
     @Override
     public void start(Stage stage) {
@@ -36,7 +48,8 @@ public class AppLayout extends Application {
         stage.show();
     }
 
-    public static void main(String[] args) {
-        launch();
+    @Override
+    public void stop() throws Exception {
+        context.close();
     }
 }

@@ -12,7 +12,7 @@ public class RightSidebar {
     public RightSidebar() {
         view = new VBox();
         view.setSpacing(10);
-        view.setStyle("-fx-padding: 10; -fx-background-color: #e0e0e0;");
+        view.setStyle("-fx-padding: 10; -fx-background-color: #0a6a10;");
         updateButtons("Uczestnicy"); // Domyślna zawartość
     }
 
@@ -56,6 +56,12 @@ public class RightSidebar {
                 view.getChildren().addAll(
                         new Button("Generuj raport"),
                         new Button("Eksportuj raport")
+                );
+                break;
+            case "Miasta":
+                view.getChildren().addAll(
+                        new Button("Dodaj miasto"),
+                        new Button("Usuń miasto")
                 );
                 break;
         }
