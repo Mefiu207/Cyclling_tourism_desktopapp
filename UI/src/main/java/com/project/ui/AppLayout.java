@@ -9,6 +9,7 @@ import javafx.stage.Stage;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import com.project.springbootjavafx.services.MiastaService;
 
 
 public class AppLayout extends Application {
@@ -22,13 +23,16 @@ public class AppLayout extends Application {
 
     @Override
     public void start(Stage stage) {
+
+        MiastaService miastaService = context.getBean(MiastaService.class);
+
         // Główny layout aplikacji
         BorderPane root = new BorderPane();
 
         // Inicjalizacja komponentów
         LeftSidebar leftSidebar = new LeftSidebar();
         RightSidebar rightSidebar = new RightSidebar();
-        MainContent mainContent = new MainContent();
+        MainContent mainContent = new MainContent(miastaService);
 
         // Ustawienie widoków
         root.setLeft(leftSidebar.getView());

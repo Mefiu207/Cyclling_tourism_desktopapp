@@ -3,20 +3,19 @@ package com.project.ui;
 
 import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
-import lombok.Getter;
 
 import java.util.function.Consumer;
 
 public class LeftSidebar {
 
-    @Getter
     private VBox view;
+
     private Consumer<String> tabSelectedListener;
 
     public LeftSidebar() {
         view = new VBox();
         view.setSpacing(10);
-        view.setStyle("-fx-padding: 10; -fx-background-color: #07530a;");
+        view.setStyle("-fx-padding: 10; -fx-background-color: #0a6a10;");
 
         // Przyciski zakładek
         Button participantsButton = new Button("Uczestnicy");
@@ -45,6 +44,10 @@ public class LeftSidebar {
 
     public void setOnTabSelected(Consumer<String> listener) {
         this.tabSelectedListener = listener;
+    }
+
+    public VBox getView(){
+        return view;
     }
 
     private void notifyTabSelected(String tabName) {
