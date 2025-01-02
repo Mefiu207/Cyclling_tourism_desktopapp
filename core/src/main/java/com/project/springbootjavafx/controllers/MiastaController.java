@@ -33,7 +33,7 @@ public class MiastaController {
     // Dodaj nowe miasto
     @PostMapping
     public Miasta addMiasto(@RequestBody Miasta miasto) {
-        return miastaService.addMiasto(miasto);
+        return miastaService.add(miasto);
     }
 
     // Usuń miasto

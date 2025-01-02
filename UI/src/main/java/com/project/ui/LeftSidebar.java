@@ -46,9 +46,7 @@ public class LeftSidebar {
         this.tabSelectedListener = listener;
     }
 
-    public VBox getView(){
-        return view;
-    }
+    public VBox getView() { return view; }
 
     private void notifyTabSelected(String tabName) {
         if (tabSelectedListener != null) {

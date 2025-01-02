@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class MiastaService {
+public class MiastaService implements ServicesInterface <Miasta, String>{
 
     private final MiastaRepository miastaRepository;
 
@@ -17,23 +17,19 @@ public class MiastaService {
         this.miastaRepository = miastaRepository;
     }
 
-    // Dodaj nowe miasto
-    public Miasta addMiasto(Miasta miasto) {
+    @Override
+    public Miasta add(Miasta miasto) {
         return miastaRepository.save(miasto);
     }
 
-    // Pobierz wszystkie miasta
-    public List<Miasta> getAllMiasta() {
+    @Override
+    public List<Miasta> getAll() {
         return miastaRepository.findAll();
     }
 
-    // Pobierz miasto na podstawie nazwy
-    public Miasta getMiastoByName(String miasto) {
-        return miastaRepository.findById(miasto).orElse(null);
-    }
+    @Override
+    public Miasta getById(String miasto) {return miastaRepository.findById(miasto).get(); }
 
-    // Usuń miasto
-    public void deleteMiasto(String miasto) {
-        miastaRepository.deleteById(miasto);
-    }
+    @Override
+    public void delete(String miasto) { miastaRepository.deleteById(miasto); }
 }

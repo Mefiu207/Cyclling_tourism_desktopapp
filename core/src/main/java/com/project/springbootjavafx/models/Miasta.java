@@ -9,7 +9,7 @@ import jakarta.persistence.Id;
 
 @Entity
 @Setter @Getter
-public class Miasta {
+public class Miasta implements Models{
 
     @Id
     private String miasto;
