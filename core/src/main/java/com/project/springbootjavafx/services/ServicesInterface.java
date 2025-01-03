@@ -1,9 +1,8 @@
 package com.project.springbootjavafx.services;
 
-import com.project.springbootjavafx.models.Models;
-
 import java.util.List;
 
+//  Interfejs który implementują wszystkie klasy @Service co umozliwia tworzenie ogólnych przycisków w klasie CustomButton
 public interface ServicesInterface<T, ID> {
 
     T add(T model);
@@ -13,4 +12,5 @@ public interface ServicesInterface<T, ID> {
     T getById(ID id);
 
     void delete(ID id);
+
 }

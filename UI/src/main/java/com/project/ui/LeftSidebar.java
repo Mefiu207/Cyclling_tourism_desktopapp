@@ -1,18 +1,31 @@
 // LeftSidebar.java
 package com.project.ui;
 
+import com.project.ui.buttons.CustomButton;
 import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 
 import java.util.function.Consumer;
 
+import com.project.springbootjavafx.services.MiastaService;
+
+import org.springframework.context.ConfigurableApplicationContext;
+
 public class LeftSidebar {
+
+    private ConfigurableApplicationContext context;
 
     private VBox view;
 
     private Consumer<String> tabSelectedListener;
 
-    public LeftSidebar() {
+    public LeftSidebar(ConfigurableApplicationContext context) {
+
+        this.context = context;
+
+        MiastaService miastaService = context.getBean(MiastaService.class);
+
+
         view = new VBox();
         view.setSpacing(10);
         view.setStyle("-fx-padding: 10; -fx-background-color: #0a6a10;");
@@ -23,7 +36,7 @@ public class LeftSidebar {
         Button hotelsButton = new Button("Hotele");
         Button tripTypesButton = new Button("Typy wycieczek");
         Button reportsButton = new Button("Raporty");
-        Button miastaButton = new Button("Miasta");
+        CustomButton miastaButton = new CustomButton(miastaService, "Miasta");
 
 
         // Domyślnie aktywna zakładka

@@ -39,7 +39,7 @@ public class MainContent {
         }
 
         ListView<String> listView = new ListView<>();
-        List<Miasta> lista = miastaService.getAllMiasta();
+        List<Miasta> lista = miastaService.getAll();
 
 
         List<String> nazwyMiast = lista.stream()

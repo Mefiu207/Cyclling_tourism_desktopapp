@@ -30,7 +30,7 @@ public class AppLayout extends Application {
         BorderPane root = new BorderPane();
 
         // Inicjalizacja komponentów
-        LeftSidebar leftSidebar = new LeftSidebar();
+        LeftSidebar leftSidebar = new LeftSidebar(context);
         RightSidebar rightSidebar = new RightSidebar();
         MainContent mainContent = new MainContent(miastaService);
 

@@ -19,7 +19,7 @@ public class MiastaPrzycisk extends Button {
     }
 
     private void onButtonClicked() {
-        List<Miasta> miasta = miastaService.getAllMiasta();
+        List<Miasta> miasta = miastaService.getAll();
     }
 
 
