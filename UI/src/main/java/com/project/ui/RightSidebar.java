@@ -13,7 +13,7 @@ public class RightSidebar {
         view = new VBox();
         view.setSpacing(10);
         view.setStyle("-fx-padding: 10; -fx-background-color: #0a6a10;");
-        updateButtons("Uczestnicy"); // Domyślna zawartość
+        updateButtons("Miasta"); // Domyślna zawartość
     }
 
     public VBox getView() {

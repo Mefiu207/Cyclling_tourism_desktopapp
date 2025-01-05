@@ -5,7 +5,10 @@ import com.project.springbootjavafx.repositories.MiastaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.lang.reflect.Field;
+import com.project.springbootjavafx.utils.Pair;
 
 @Service
 public class MiastaService implements ServicesInterface <Miasta, String>{
@@ -27,9 +30,25 @@ public class MiastaService implements ServicesInterface <Miasta, String>{
         return miastaRepository.findAll();
     }
 
+    // Pamiętaj by obsłużyc wyjątek mordo
     @Override
     public Miasta getById(String miasto) {return miastaRepository.findById(miasto).get(); }
 
     @Override
     public void delete(String miasto) { miastaRepository.deleteById(miasto); }
+
+    @Override
+    public ArrayList<Pair<String, String>> getFieldsTypes(){
+        ArrayList<Pair<String, String>> fieldInfo = new ArrayList<>();
+
+        Field[] fields = Miasta.class.getDeclaredFields();
+
+        for(Field field : fields){
+            String fieldName = field.getName();
+            String fieldType = field.getType().getSimpleName();
+            fieldInfo.add(new Pair<>(fieldName, fieldType));
+        }
+
+        return fieldInfo;
+    }
 }

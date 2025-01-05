@@ -1,14 +1,11 @@
 package com.project.springbootjavafx.models;
 
 
-import lombok.Getter;
-import lombok.Setter;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
 
 @Entity
-@Setter @Getter
 public class Miasta implements Models{
 
     @Id
@@ -17,4 +14,10 @@ public class Miasta implements Models{
     public String toString(){
         return miasto;
     }
+
+    public String getMiasto(){
+        return miasto;
+    }
+
+    public void setMiasto(String miasto){this.miasto = miasto;}
 }

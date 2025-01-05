@@ -1,54 +1,37 @@
 
 package com.project.ui;
 
-import java.util.List;
-
-import javafx.collections.FXCollections;
-import javafx.scene.control.ListView;
-import javafx.scene.layout.StackPane;
+import javafx.scene.control.TableView;
+import com.project.ui.buttons.CustomLeftButton;
 import javafx.scene.text.Text;
 
-import com.project.springbootjavafx.services.MiastaService;
-import com.project.springbootjavafx.models.Miasta;
+import javafx.scene.layout.StackPane;
+
 
 
 public class MainContent {
 
     private StackPane view;
-    private MiastaService miastaService;
 
 
-    public MainContent(MiastaService miastaService) {
-        this.miastaService = miastaService;
+    public MainContent() {
         view = new StackPane();
-        updateContent("Uczestnicy"); // Domyślny widok
         view.setStyle("-fx-padding: 10; -fx-background-color: #0e4327;");
+        // Ustawienie domyślnego komunikatu
+        view.getChildren().add(new Text("Wybierz zakładkę z lewej strony"));
     }
 
     public StackPane getView() {
         return view;
     }
 
-    public void updateContent(String activeTab) {
-
+    public <T> void updateContent(TableView<T> tableView) {
         view.getChildren().clear();
 
-        if (!"Miasta".equals(activeTab)) {
-            view.getChildren().add(new Text("Widok: " + activeTab));
-            return;
+        if (tableView == null || tableView.getItems().isEmpty()) {
+            view.getChildren().add(new Text("Brak danych do wyświetlenia."));
+        } else {
+            view.getChildren().add(tableView);
         }
-
-        ListView<String> listView = new ListView<>();
-        List<Miasta> lista = miastaService.getAll();
-
-
-        List<String> nazwyMiast = lista.stream()
-                .map(Miasta::getMiasto)
-                .toList();
-
-        listView.setItems(FXCollections.observableArrayList(nazwyMiast));
-        view.getChildren().add(listView);
-
-        // TODO: Dodaj logikę do wyświetlania szczegółowych widoków dla każdej zakładki
     }
 }
