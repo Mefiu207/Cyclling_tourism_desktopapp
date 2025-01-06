@@ -32,6 +32,7 @@ public class CustomLeftButton<T, ID> extends Button {
         this.setOnAction(e -> onClick());
     }
 
+    // Tworzy tabele z danych z services
     private void onClick() {
         TableView<T> tableView = new TableView<>();
 
@@ -53,5 +54,9 @@ public class CustomLeftButton<T, ID> extends Button {
         if (onTableCreated != null) {
             onTableCreated.accept(tableView);
         }
+    }
+
+    public ServicesInterface<T,ID> getServices() {
+        return services;
     }
 }

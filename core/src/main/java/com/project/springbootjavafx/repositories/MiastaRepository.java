@@ -6,5 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MiastaRepository extends JpaRepository<Miasta, String> {
-    // Możesz dodać niestandardowe metody, jeśli będą potrzebne
+
+    boolean existsByMiasto(String miasto);
 }

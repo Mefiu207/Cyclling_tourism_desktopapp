@@ -11,6 +11,12 @@ public class Miasta implements Models{
     @Id
     private String miasto;
 
+    public Miasta(){}
+
+    public Miasta(final String miasto) {
+        this.miasto = miasto;
+    }
+
     public String toString(){
         return miasto;
     }

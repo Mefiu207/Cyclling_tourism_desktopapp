@@ -1,7 +1,6 @@
 
 package com.project.ui;
 
-import com.project.ui.buttons.CustomLeftButton;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -27,9 +26,9 @@ public class AppLayout extends Application {
 
         BorderPane root = new BorderPane();
 
-        LeftSidebar leftSidebar = new LeftSidebar(context);
-        RightSidebar rightSidebar = new RightSidebar();
         MainContent mainContent = new MainContent();
+        LeftSidebar leftSidebar = new LeftSidebar(context);
+        RightSidebar rightSidebar = new RightSidebar(context, mainContent);
 
 
         // Ustawienie widoków
@@ -38,9 +37,7 @@ public class AppLayout extends Application {
         root.setRight(rightSidebar.getView());
 
         leftSidebar.setOnTabSelected((tabName, tableView) -> {
-            if ("Miasta".equals(tabName)) {
                 mainContent.updateContent(tableView);
-            }
         });
 
 
@@ -55,11 +52,6 @@ public class AppLayout extends Application {
         stage.setScene(scene);
         stage.show();
 
-//        leftSidebar.getView().getChildren().forEach(node -> {
-//            if (node instanceof CustomLeftButton<?, ?> button && "Miasta".equals(button.getText())) {
-//                button.fire();
-//            }
-//        });
 
     }
 

@@ -10,6 +10,8 @@ import java.util.List;
 import java.lang.reflect.Field;
 import com.project.springbootjavafx.utils.Pair;
 
+import com.project.springbootjavafx.exceptions.DuplicatedMiastoException;
+
 @Service
 public class MiastaService implements ServicesInterface <Miasta, String>{
 
@@ -21,7 +23,12 @@ public class MiastaService implements ServicesInterface <Miasta, String>{
     }
 
     @Override
-    public Miasta add(Miasta miasto) {
+    public Miasta add(Miasta miasto) throws DuplicatedMiastoException{
+
+        if (miastaRepository.existsByMiasto(miasto.getMiasto())) {
+            throw new DuplicatedMiastoException("Miasto już istnieje");
+        }
+
         return miastaRepository.save(miasto);
     }
 

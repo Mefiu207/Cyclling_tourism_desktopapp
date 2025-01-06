@@ -1,6 +1,8 @@
+
 package com.project.ui;
 
 
+import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 import java.util.function.BiConsumer;
 import javafx.scene.control.TableView;
@@ -14,15 +16,12 @@ import com.project.springbootjavafx.services.*;
 
 public class LeftSidebar {
 
-
-    private ConfigurableApplicationContext context;
     private VBox view;
     private BiConsumer<String, TableView<?>> tabSelectedListener;
 
 
     public LeftSidebar(ConfigurableApplicationContext context) {
 
-        this.context = context;
         view = new VBox();
         view.setSpacing(10);
         view.setStyle("-fx-padding: 10; -fx-background-color: #0a6a10;");
@@ -38,6 +37,8 @@ public class LeftSidebar {
                 "Miasta",
                 tableView -> notifyTabSelected("Miasta", tableView)
         );
+
+        Button nowe = new Button("Cus");
 
         view.getChildren().add(miastaButton);
     }
