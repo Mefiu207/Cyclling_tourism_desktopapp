@@ -2,45 +2,41 @@
 package com.project.ui;
 
 import com.project.springbootjavafx.services.*;
+import com.project.ui.buttons.CustomLeftButton;
+import com.project.ui.buttons.RightDeleteButton;
+
 import com.project.ui.buttons.adding.AddMiastaButton;
-import com.project.springbootjavafx.models.Models;
 
 import javafx.scene.layout.VBox;
 
-import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.stereotype.Component;
 
-
+@Component
 public class RightSidebar {
 
     private VBox view;
-    private MainContent mainContent;
 
 
-    public RightSidebar(ConfigurableApplicationContext context, MainContent mainContent) {
-
-        this.mainContent = mainContent;
+    public RightSidebar() {
 
         view = new VBox();
         view.setSpacing(10);
         view.setStyle("-fx-padding: 10; -fx-background-color: #0a6a10;");
-        updateButtons("Miasta", context); // Domyślna zawartość
     }
 
     public VBox getView() {
         return view;
     }
 
-    public void updateButtons(String activeTab, ConfigurableApplicationContext context) {
+    public void updateButtons(CustomLeftButton<?, ?> activeButton) {
         view.getChildren().clear();
 
-        switch (activeTab) {
+        switch (activeButton.getText()) {
 
             case "Miasta":
-
-                MiastaService miastaService = context.getBean(MiastaService.class);
-
                 view.getChildren().addAll(
-                        new AddMiastaButton(miastaService, "Dodaj miasto", this::handleModelAdded)
+                        new AddMiastaButton("Dodaj miasto", activeButton),
+                        new RightDeleteButton("Usuń miasto", activeButton)
                 );
                 break;
 
@@ -48,7 +44,4 @@ public class RightSidebar {
 
     }
 
-    private void handleModelAdded(Models model){
-         mainContent.refreshTable();
-    }
 }

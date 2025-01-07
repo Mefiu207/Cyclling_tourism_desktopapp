@@ -1,6 +1,10 @@
 package com.project.ui.buttons;
 
 import com.project.springbootjavafx.services.ServicesInterface;
+
+import com.project.ui.MainContent;
+import com.project.ui.RightSidebar;
+import com.project.ui.SpringContextHolder;
 import javafx.collections.FXCollections;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
@@ -10,22 +14,22 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import com.project.springbootjavafx.utils.Pair;
 
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.ArrayList;
 
-
+// Generyczny przycisk w lewym panelu działający dla dowolnego typu encji
 public class CustomLeftButton<T, ID> extends Button {
 
     private ServicesInterface<T, ID> services;
-    private Consumer<TableView<T>> onTableCreated;
+
 
     // Lista pól: nazwa pola i jego typ (potrzebne do generowania pól tabeli)
     private ArrayList<Pair<String, String>> fieldsTypes;
 
-    public CustomLeftButton(ServicesInterface<T, ID> services, String name, Consumer<TableView<T>> onTableCreated) {
+
+    public CustomLeftButton(ServicesInterface<T, ID> services, String name) {
         super(name);
+
         this.services = services;
-        this.onTableCreated = onTableCreated;
 
         this.fieldsTypes = services.getFieldsTypes();
 
@@ -33,8 +37,18 @@ public class CustomLeftButton<T, ID> extends Button {
     }
 
     // Tworzy tabele z danych z services
-    private void onClick() {
+    public void onClick() {
+
+
+        MainContent mainContent = SpringContextHolder.getContext().getBean(MainContent.class);
+
+        // Upadatuje rightSidebar w zależności od wybranego przycisku
+        RightSidebar rightSidebar = SpringContextHolder.getContext().getBean(RightSidebar.class);
+        rightSidebar.updateButtons(this);
+
+
         TableView<T> tableView = new TableView<>();
+
 
         for (Pair<String, String> fieldPair : fieldsTypes) {
             String fieldName = fieldPair.getKey();
@@ -50,10 +64,8 @@ public class CustomLeftButton<T, ID> extends Button {
         List<T> data = services.getAll();
         tableView.setItems(FXCollections.observableArrayList(data));
 
-        // Przekazanie tabeli do callbacku
-        if (onTableCreated != null) {
-            onTableCreated.accept(tableView);
-        }
+        mainContent.updateContent(tableView);
+
     }
 
     public ServicesInterface<T,ID> getServices() {

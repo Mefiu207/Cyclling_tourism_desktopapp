@@ -1,6 +1,7 @@
 
 package com.project.ui;
 
+import com.project.SpringBootConfig;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -14,11 +15,14 @@ import org.springframework.context.ConfigurableApplicationContext;
 
 public class AppLayout extends Application {
 
+
     private ConfigurableApplicationContext context;
 
     @Override
     public void init() throws Exception {
         context = SpringApplication.run(SpringBootConfig.class);
+        context.getBean(SpringContextHolder.class);
+        System.out.println("Spring Boot Application Started");
     }
 
     @Override
@@ -26,19 +30,16 @@ public class AppLayout extends Application {
 
         BorderPane root = new BorderPane();
 
-        MainContent mainContent = new MainContent();
-        LeftSidebar leftSidebar = new LeftSidebar(context);
-        RightSidebar rightSidebar = new RightSidebar(context, mainContent);
+
+        MainContent mainContent = context.getBean(MainContent.class);
+        RightSidebar rightSidebar = context.getBean(RightSidebar.class);
+        LeftSidebar leftSidebar = context.getBean(LeftSidebar.class);
 
 
         // Ustawienie widoków
         root.setLeft(leftSidebar.getView());
         root.setCenter(mainContent.getView());
         root.setRight(rightSidebar.getView());
-
-        leftSidebar.setOnTabSelected((tabName, tableView) -> {
-                mainContent.updateContent(tableView);
-        });
 
 
         // Ikona okna

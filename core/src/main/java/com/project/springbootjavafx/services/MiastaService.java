@@ -25,8 +25,9 @@ public class MiastaService implements ServicesInterface <Miasta, String>{
     @Override
     public Miasta add(Miasta miasto) throws DuplicatedMiastoException{
 
+        // Sprawdzanie czy dodawane miasto już istnieje
         if (miastaRepository.existsByMiasto(miasto.getMiasto())) {
-            throw new DuplicatedMiastoException("Miasto już istnieje");
+            throw new DuplicatedMiastoException("Miasto " + miasto.getMiasto()+ " już istnieje");
         }
 
         return miastaRepository.save(miasto);

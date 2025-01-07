@@ -3,24 +3,24 @@ package com.project.ui.buttons.adding;
 import com.project.springbootjavafx.exceptions.DuplicatedMiastoException;
 import com.project.springbootjavafx.models.Miasta;
 import com.project.springbootjavafx.services.MiastaService;
+import com.project.ui.SpringContextHolder;
+import com.project.ui.buttons.CustomLeftButton;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 
 import java.util.Optional;
-import java.util.function.Consumer;
 
 public class AddMiastaButton extends Button {
 
     private MiastaService miastaService;
-    private Consumer<Miasta> onMiastaAdded;
+    private CustomLeftButton<?, ?> leftButton;
 
-
-    public AddMiastaButton(MiastaService miastaService, String name, Consumer<Miasta> onMiastaAdded) {
+    public AddMiastaButton(String name, CustomLeftButton<?, ?> leftButton) {
         super(name);
-        this.miastaService = miastaService;
-        this.onMiastaAdded = onMiastaAdded;
+        this.leftButton = leftButton;
+        this.miastaService = SpringContextHolder.getContext().getBean(MiastaService.class);
 
         // Ustawienie akcji po kliknięciu przycisku
         this.setOnAction(e -> openAddMiastoDialog());
@@ -69,10 +69,13 @@ public class AddMiastaButton extends Button {
         result.ifPresent(miastoObj -> {
             try {
                 miastaService.add(miastoObj);
-                onMiastaAdded.accept(miastoObj);
-//                showAlert(Alert.AlertType.INFORMATION, "Sukces", "Miasto zostało dodane.");
+                leftButton.onClick();
+
+                // Dodać żeby scrolowało do dołu tabeli jakoś
+
+               showAlert(Alert.AlertType.INFORMATION, "Sukces", "Miasto zostało dodane.");
             } catch (DuplicatedMiastoException ex) {
-                showAlert(Alert.AlertType.ERROR, "Błąd", "Miasto o nazwie \"" + miastoObj.getMiasto() + "\" już istnieje.");
+                showAlert(Alert.AlertType.ERROR, "Błąd", ex.getMessage());
             }
         });
     }
@@ -87,13 +90,3 @@ public class AddMiastaButton extends Button {
         alert.showAndWait();
     }
 }
-
-
-//AddMiastoButton addMiastoButton = new AddMiastoButton(
-//        miastaService,
-//        "Dodaj Miasto",
-//        miasto -> {
-//            // Kod, który odświeża tabelę miast
-//            mainContent.refreshTable();
-//        }
-//);
