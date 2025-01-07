@@ -1,8 +1,9 @@
 package com.project.ui.buttons.adding;
 
-import com.project.springbootjavafx.exceptions.DuplicatedMiastoException;
+import com.project.springbootjavafx.exceptions.DuplicatedEntityExceptionn;
 import com.project.springbootjavafx.models.Miasta;
 import com.project.springbootjavafx.services.MiastaService;
+import com.project.ui.MainContent;
 import com.project.ui.SpringContextHolder;
 import com.project.ui.buttons.CustomLeftButton;
 import javafx.application.Platform;
@@ -15,6 +16,8 @@ import java.util.Optional;
 public class AddMiastaButton extends Button {
 
     private MiastaService miastaService;
+
+    // Musi być <?, ?> bo w RightSidebar nie znamy jescze typów przechowywanych
     private CustomLeftButton<?, ?> leftButton;
 
     public AddMiastaButton(String name, CustomLeftButton<?, ?> leftButton) {
@@ -28,6 +31,9 @@ public class AddMiastaButton extends Button {
 
 
     private void openAddMiastoDialog() {
+
+        // Pozwoli scrollować tabele do dołu na
+        MainContent mainContent = SpringContextHolder.getContext().getBean(MainContent.class);
 
         Dialog<Miasta> dialog = new Dialog<>();
         dialog.setTitle("Dodaj Miasto");
@@ -71,10 +77,10 @@ public class AddMiastaButton extends Button {
                 miastaService.add(miastoObj);
                 leftButton.onClick();
 
-                // Dodać żeby scrolowało do dołu tabeli jakoś
+                mainContent.scrollToBottom();
 
                showAlert(Alert.AlertType.INFORMATION, "Sukces", "Miasto zostało dodane.");
-            } catch (DuplicatedMiastoException ex) {
+            } catch (DuplicatedEntityExceptionn ex) {
                 showAlert(Alert.AlertType.ERROR, "Błąd", ex.getMessage());
             }
         });

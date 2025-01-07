@@ -1,6 +1,6 @@
 package com.project.ui.buttons;
 
-import com.project.springbootjavafx.services.ServicesInterface;
+import com.project.springbootjavafx.services.AbstractServices;
 
 import com.project.ui.MainContent;
 import com.project.ui.RightSidebar;
@@ -19,14 +19,14 @@ import java.util.ArrayList;
 // Generyczny przycisk w lewym panelu działający dla dowolnego typu encji
 public class CustomLeftButton<T, ID> extends Button {
 
-    private ServicesInterface<T, ID> services;
+    private AbstractServices<T, ID> services;
 
 
     // Lista pól: nazwa pola i jego typ (potrzebne do generowania pól tabeli)
     private ArrayList<Pair<String, String>> fieldsTypes;
 
 
-    public CustomLeftButton(ServicesInterface<T, ID> services, String name) {
+    public CustomLeftButton(AbstractServices<T, ID> services, String name) {
         super(name);
 
         this.services = services;
@@ -68,7 +68,7 @@ public class CustomLeftButton<T, ID> extends Button {
 
     }
 
-    public ServicesInterface<T,ID> getServices() {
+    public AbstractServices<T,ID> getServices() {
         return services;
     }
 }

@@ -5,6 +5,7 @@ import com.project.springbootjavafx.services.*;
 import com.project.ui.buttons.CustomLeftButton;
 import com.project.ui.buttons.RightDeleteButton;
 
+import com.project.ui.buttons.adding.AddHoteleButton;
 import com.project.ui.buttons.adding.AddMiastaButton;
 
 import javafx.scene.layout.VBox;
@@ -37,6 +38,13 @@ public class RightSidebar {
                 view.getChildren().addAll(
                         new AddMiastaButton("Dodaj miasto", activeButton),
                         new RightDeleteButton("Usuń miasto", activeButton)
+                );
+                break;
+
+            case "Hotele":
+                view.getChildren().addAll(
+                        new AddHoteleButton("Dodaj hotele", activeButton),
+                        new RightDeleteButton<>("Usuń Hotel", activeButton)
                 );
                 break;
 
