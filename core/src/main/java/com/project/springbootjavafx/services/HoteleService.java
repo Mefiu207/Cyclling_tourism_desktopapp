@@ -1,7 +1,7 @@
 package com.project.springbootjavafx.services;
 
 import com.project.springbootjavafx.exceptions.DuplicatedEntityExceptionn;
-import com.project.springbootjavafx.exceptions.WrongHotelCodeException;
+import com.project.springbootjavafx.exceptions.WrongCodeLengthException;
 import com.project.springbootjavafx.models.Hotele;
 import com.project.springbootjavafx.repositories.HoteleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,13 +20,13 @@ public class HoteleService extends AbstractServices<Hotele, String>{
     }
 
     @Override
-    public Hotele add(Hotele hotel) throws DuplicatedEntityExceptionn, WrongHotelCodeException{
+    public Hotele add(Hotele hotel) throws DuplicatedEntityExceptionn, WrongCodeLengthException {
 
         if(hoteleRepository.existsByKod(hotel.getKod())){
             throw new DuplicatedEntityExceptionn("Hotel o kodzie " + hotel.getKod()+ " już istnieje");
         }
         else if(hotel.getKod().trim().length() != 6){
-            throw new WrongHotelCodeException("Za krótki lub za długi kod hotelu");
+            throw new WrongCodeLengthException("Za krótki lub za długi kod hotelu (ma być 6 znaków)");
         }
 
         return hoteleRepository.save(hotel);

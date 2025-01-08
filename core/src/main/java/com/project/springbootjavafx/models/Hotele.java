@@ -13,7 +13,7 @@ public class Hotele implements Models {
 
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "miasto", referencedColumnName = "miasto")
+    @JoinColumn(name = "miasto")
     private Miasta miasto;
 
 

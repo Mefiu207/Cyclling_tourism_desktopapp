@@ -1,7 +1,7 @@
 package com.project.ui.buttons.adding;
 
 import com.project.springbootjavafx.exceptions.DuplicatedEntityExceptionn;
-import com.project.springbootjavafx.exceptions.WrongHotelCodeException;
+import com.project.springbootjavafx.exceptions.WrongCodeLengthException;
 import com.project.springbootjavafx.models.Hotele;
 import com.project.springbootjavafx.models.Miasta;
 import com.project.springbootjavafx.services.HoteleService;
@@ -15,8 +15,6 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
-import javafx.stage.Stage;
-import javafx.application.Platform;
 
 public class AddHoteleButton extends Button {
 
@@ -135,7 +133,7 @@ public class AddHoteleButton extends Button {
                 alert.setHeaderText(null);
                 alert.setContentText("Hotel został dodany pomyślnie!");
                 alert.showAndWait();
-            } catch (WrongHotelCodeException ex) {
+            } catch (WrongCodeLengthException ex) {
                 exceptionAlert(ex.getMessage());
             } catch (DuplicatedEntityExceptionn ex) {
                 exceptionAlert(ex.getMessage());

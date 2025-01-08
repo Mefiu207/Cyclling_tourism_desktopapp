@@ -1,13 +1,11 @@
 package com.project.springbootjavafx.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-
-import com.project.springbootjavafx.models.Hotele;
 import org.springframework.stereotype.Repository;
 
+import com.project.springbootjavafx.models.Ceny;
+
 @Repository
-public interface HoteleRepository extends JpaRepository<Hotele, String> {
+public interface CenyRepository extends JpaRepository<Ceny, Integer> {
 
-    boolean existsByKod(String kod);
 }
-
