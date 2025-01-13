@@ -39,7 +39,8 @@ public abstract class AbstractServices<T, ID> {
         return idClass;
     }
 
-    // Zwraca liste pol co daje mozliwosc uogolnienia klasy przycisk
+    // Pamiętaj że w niektórych klasach pochodnych metode trzeba nadpisać !!!!!!!!!!!!!!!!!!!
+    // Zwraca liste pol co daje mozliwosc uogolnienia klasy CustomLeftButton
     public ArrayList<Pair<String, String>> getFieldsTypes(){
         ArrayList<Pair<String, String>> fieldInfo = new ArrayList<>();
 
@@ -47,12 +48,12 @@ public abstract class AbstractServices<T, ID> {
 
 
         for(Field field : fields){
-            // Sprawdzenie, czy pole ma adnotację relacyjną
+            // Sprawdzenie, czy pole ma adnotację
             if(field.isAnnotationPresent(OneToMany.class) ||
                     field.isAnnotationPresent(ManyToOne.class) ||
                     field.isAnnotationPresent(OneToOne.class) ||
                     field.isAnnotationPresent(ManyToMany.class)){
-                continue; // Pominięcie pól relacyjnych
+                continue;
             }
 
             String fieldName = field.getName();

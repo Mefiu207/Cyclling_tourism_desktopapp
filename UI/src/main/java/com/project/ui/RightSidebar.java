@@ -10,9 +10,11 @@ import com.project.ui.buttons.adding.AddMiastaButton;
 
 import javafx.scene.layout.VBox;
 
+import lombok.Getter;
 import org.springframework.stereotype.Component;
 
 @Component
+@Getter
 public class RightSidebar {
 
     private VBox view;
@@ -25,9 +27,6 @@ public class RightSidebar {
         view.setStyle("-fx-padding: 10; -fx-background-color: #0a6a10;");
     }
 
-    public VBox getView() {
-        return view;
-    }
 
     public void updateButtons(CustomLeftButton<?, ?> activeButton) {
         view.getChildren().clear();

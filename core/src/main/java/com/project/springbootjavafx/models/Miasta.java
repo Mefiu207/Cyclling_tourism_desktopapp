@@ -1,24 +1,28 @@
 package com.project.springbootjavafx.models;
 
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
-import jakarta.persistence.OneToMany;
 
 import java.util.List;
 
-
+@Setter
+@Getter
 @Entity
 public class Miasta implements Models{
 
     @Id
     private String miasto;
 
+    // Powiazanie do hoteli
     @OneToMany(mappedBy = "miasto", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Hotele> hotele;
 
+    // Polaczenie z tabele miasta wycieczek
+    @OneToMany(mappedBy = "miasta")
+    private List<MiastaWycieczek> miastaWycieczek;
 
     public Miasta(){}
 
@@ -31,11 +35,4 @@ public class Miasta implements Models{
         return miasto;
     }
 
-
-
-    public String getMiasto(){
-        return miasto;
-    }
-
-    public void setMiasto(String miasto){this.miasto = miasto;}
 }

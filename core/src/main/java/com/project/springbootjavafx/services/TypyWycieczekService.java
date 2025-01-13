@@ -26,8 +26,8 @@ public class TypyWycieczekService extends AbstractServices<TypyWycieczek, String
         if (typy_wycieczekRepository.existsByTyp(typy_wycieczek.getTyp())) {
             throw new DuplicatedEntityExceptionn("Wycieczka o typie " + typy_wycieczek.getTyp() + " już istnieje");
         }
-        else if (typy_wycieczek.getTyp().trim().length() != 3) {
-            throw new WrongCodeLengthException("Za krótka lub za długa nazwa typu (mają być 3 znaki)");
+        else if (typy_wycieczek.getTyp().trim().length() != 3 && typy_wycieczek.getTyp().trim().length() != 2) {
+            throw new WrongCodeLengthException("Za krótka lub za długa nazwa typu (mają być 3 albo 2 znaki)");
         }
 
         return typy_wycieczekRepository.save(typy_wycieczek);

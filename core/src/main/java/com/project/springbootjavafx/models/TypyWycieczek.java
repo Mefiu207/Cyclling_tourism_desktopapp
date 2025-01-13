@@ -3,19 +3,30 @@ package com.project.springbootjavafx.models;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
+
 @Entity
 @Table(name = "typy_wycieczek")
 public class TypyWycieczek implements Models {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private String typ;
 
     private Integer liczba_nocy;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "id")
+    // Ceny dla danego  typu wycieczki
+    @OneToOne(mappedBy = "typ_wycieczki")
     private Ceny ceny;
+
+    // Miasta danej wycieczki
+    @OneToMany(mappedBy = "typyWycieczek")
+    private List<MiastaWycieczek> miastaWycieczek;
+
+    // Wycieczki dla danego typu
+    @OneToMany(mappedBy = "typWycieczki")
+    private List<Wycieczki> wycieczki;
+
 
 
     public TypyWycieczek(String typ, Integer liczba_nocy, Ceny ceny) {
@@ -33,9 +44,7 @@ public class TypyWycieczek implements Models {
     }
 
 
-    public String getTyp() {
-        return this.typ;
-    }
+    public String getTyp() { return this.typ; }
 
     public Integer getLiczba_nocy() {
         return this.liczba_nocy;

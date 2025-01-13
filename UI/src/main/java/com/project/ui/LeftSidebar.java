@@ -28,6 +28,7 @@ public class LeftSidebar {
         // Inicjalizacja po wstrzyknięciu zależności
         MiastaService miastaService = SpringContextHolder.getContext().getBean(MiastaService.class);
         HoteleService hoteleService = SpringContextHolder.getContext().getBean(HoteleService.class);
+        TypyWycieczekService typyWycieczekService = SpringContextHolder.getContext().getBean(TypyWycieczekService.class);
 
         CustomLeftButton<Miasta, String> miastaButton = new CustomLeftButton<>(
                 miastaService,
@@ -39,9 +40,14 @@ public class LeftSidebar {
                 "Hotele"
         );
 
+        CustomLeftButton<TypyWycieczek, String> typyWycieczekButton = new CustomLeftButton<>(
+                typyWycieczekService,
+                "Typy wycieczek"
+        );
 
 
-        view.getChildren().addAll(miastaButton, hoteleButton);
+
+        view.getChildren().addAll(miastaButton, hoteleButton, typyWycieczekButton);
     }
 
     public VBox getView() {
