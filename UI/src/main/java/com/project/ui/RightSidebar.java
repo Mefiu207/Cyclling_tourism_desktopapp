@@ -8,6 +8,7 @@ import com.project.ui.buttons.RightDeleteButton;
 import com.project.ui.buttons.adding.AddHoteleButton;
 import com.project.ui.buttons.adding.AddMiastaButton;
 
+import com.project.ui.buttons.adding.AddTypyWycieczekButton;
 import javafx.scene.layout.VBox;
 
 import lombok.Getter;
@@ -44,6 +45,14 @@ public class RightSidebar {
                 view.getChildren().addAll(
                         new AddHoteleButton("Dodaj hotele", activeButton),
                         new RightDeleteButton<>("Usuń Hotel", activeButton)
+                );
+                break;
+
+
+            case "Typy wycieczek":
+                view.getChildren().addAll(
+                        new AddTypyWycieczekButton("Dodaj Typ Wycieczki", activeButton),
+                        new RightDeleteButton<>("Usuń Typ Wycieczki", activeButton)
                 );
                 break;
 

@@ -12,11 +12,16 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import com.project.springbootjavafx.utils.Pair;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 import java.util.ArrayList;
 
+
 // Generyczny przycisk w lewym panelu działający dla dowolnego typu encji
+@Getter
+@Setter
 public class CustomLeftButton<T, ID> extends Button {
 
     private AbstractServices<T, ID> services;
@@ -68,7 +73,4 @@ public class CustomLeftButton<T, ID> extends Button {
 
     }
 
-    public AbstractServices<T,ID> getServices() {
-        return services;
-    }
 }
