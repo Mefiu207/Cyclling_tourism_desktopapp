@@ -90,7 +90,6 @@ public class AddTypyWycieczekButton extends Button {
         dialog.showAndWait().ifPresent(typWycieczki -> {
             try {
                 typyService.add(typWycieczki); // Zapisanie nowego typu wycieczki
-                showAlert(Alert.AlertType.INFORMATION, "Sukces", "Typ wycieczki został dodany.");
                 leftButton.onClick(); // Odświeżenie tabeli
                 openAddCenyDialog(typWycieczki); // Otwarcie dialogu do dodania cen
             } catch (DuplicatedEntityExceptionn e) {

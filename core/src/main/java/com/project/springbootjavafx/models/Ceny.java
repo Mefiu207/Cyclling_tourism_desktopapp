@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 public class Ceny implements Models {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @OneToOne
