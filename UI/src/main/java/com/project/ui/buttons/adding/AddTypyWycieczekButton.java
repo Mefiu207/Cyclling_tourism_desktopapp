@@ -3,32 +3,45 @@ package com.project.ui.buttons.adding;
 import com.project.springbootjavafx.exceptions.DuplicatedEntityExceptionn;
 import com.project.springbootjavafx.models.Ceny;
 import com.project.springbootjavafx.models.TypyWycieczek;
+import com.project.springbootjavafx.models.MiastaWycieczek;
+import com.project.springbootjavafx.models.Miasta;
+
 
 import com.project.springbootjavafx.services.CenyService;
+import com.project.springbootjavafx.services.MiastaService;
 import com.project.springbootjavafx.services.TypyWycieczekService;
+import com.project.springbootjavafx.services.MiastaWycieczekService;
 
 import com.project.ui.SpringContextHolder;
 import com.project.ui.buttons.CustomLeftButton;
 
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AddTypyWycieczekButton extends Button {
 
     private final CustomLeftButton<?, ?> leftButton;
     private final TypyWycieczekService typyService;
     private final CenyService cenyService;
+    private final MiastaService miastaService;
+    private final MiastaWycieczekService miastaWycieczekService;
 
     public AddTypyWycieczekButton(String name, CustomLeftButton<?, ?> leftButton) {
         super(name);
 
         this.leftButton = leftButton;
+
         this.typyService = SpringContextHolder.getContext().getBean(TypyWycieczekService.class);
         this.cenyService = SpringContextHolder.getContext().getBean(CenyService.class);
+        this.miastaService = SpringContextHolder.getContext().getBean(MiastaService.class);
+        this.miastaWycieczekService = SpringContextHolder.getContext().getBean(MiastaWycieczekService.class);
 
         this.setOnAction(e -> openAddTypyDialog());
     }
@@ -92,6 +105,7 @@ public class AddTypyWycieczekButton extends Button {
                 typyService.add(typWycieczki); // Zapisanie nowego typu wycieczki
                 leftButton.onClick(); // Odświeżenie tabeli
                 openAddCenyDialog(typWycieczki); // Otwarcie dialogu do dodania cen
+                openAddMiastaWycieczkiDialog(typWycieczki);
             } catch (DuplicatedEntityExceptionn e) {
                 showAlert(Alert.AlertType.ERROR, "Błąd", e.getMessage());
             }
@@ -213,6 +227,88 @@ public class AddTypyWycieczekButton extends Button {
             } catch (Exception e) {
                 showAlert(Alert.AlertType.ERROR, "Błąd", "Nie udało się dodać cen: " + e.getMessage());
             }
+        });
+    }
+
+
+    /**
+     * Metoda otwierająca dialog ustawiania miast wycieczki dla danego typu
+     */
+    private void openAddMiastaWycieczkiDialog(TypyWycieczek typWycieczki) {
+        // Tworzenie dialogu do dodania MiastaWycieczek
+        Dialog<List<MiastaWycieczek>> dialog = new Dialog<>();
+        dialog.setTitle("Dodaj Miasta do Wycieczki");
+        dialog.setHeaderText("Przypisz miasta do poszczególnych nocy wycieczki.");
+
+        // Ustawienie przycisków
+        ButtonType addButtonType = new ButtonType("Dodaj Miasta", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(addButtonType, ButtonType.CANCEL);
+
+        // Tworzenie formularza
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+
+        // Pobranie listy dostępnych miast
+        List<Miasta> dostępneMiasta = miastaService.getAll();
+
+        if (dostępneMiasta.isEmpty()) {
+            showAlert(Alert.AlertType.ERROR, "Błąd", "Brak dostępnych miast do przypisania.");
+            return;
+        }
+
+        // Lista ComboBoxów dla wyboru miast
+        List<ComboBox<Miasta>> comboBoxList = new ArrayList<>();
+
+        // Dynamiczne tworzenie pól na podstawie liczby nocy
+        for (int i = 1; i <= typWycieczki.getLiczba_nocy(); i++) {
+            Label label = new Label("Miasto na noc " + i + ":");
+            ComboBox<Miasta> comboBox = new ComboBox<>();
+            comboBox.setItems(FXCollections.observableArrayList(dostępneMiasta));
+            comboBox.setPromptText("Wybierz Miasto");
+            grid.add(label, 0, i - 1);
+            grid.add(comboBox, 1, i - 1);
+            comboBoxList.add(comboBox);
+        }
+
+        dialog.getDialogPane().setContent(grid);
+
+        // Ustawienie fokusu na pierwszym ComboBoxie
+        Platform.runLater(() -> {
+            if (!comboBoxList.isEmpty()) {
+                comboBoxList.get(0).requestFocus();
+            }
+        });
+
+        // Konwersja wyniku dialogu na listę obiektów MiastaWycieczek
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == addButtonType) {
+                List<MiastaWycieczek> miastaWycieczekList = new ArrayList<>();
+                for (int i = 0; i < comboBoxList.size(); i++) {
+                    ComboBox<Miasta> comboBox = comboBoxList.get(i);
+                    Miasta wybraneMiasto = comboBox.getValue();
+                    if (wybraneMiasto == null) {
+                        showAlert(Alert.AlertType.ERROR, "Błąd", "Wszystkie pola muszą być wypełnione.");
+                        return null;
+                    }
+                    MiastaWycieczek miastaWycieczek = new MiastaWycieczek();
+                    miastaWycieczek.setTypyWycieczek(typWycieczki);
+                    miastaWycieczek.setMiasta(wybraneMiasto);
+                    miastaWycieczek.setNumerNocy(i + 1);
+                    miastaWycieczekList.add(miastaWycieczek);
+                }
+                return miastaWycieczekList;
+            }
+            return null;
+        });
+
+        // Obsługa wyniku dialogu
+        dialog.showAndWait().ifPresent(miastaWycieczekList -> {
+            // Zapisanie MiastaWycieczek w bazie danych
+            for (MiastaWycieczek miastaWycieczek : miastaWycieczekList) {
+                miastaWycieczekService.add(miastaWycieczek);
+            }
+            showAlert(Alert.AlertType.INFORMATION, "Sukces", "Miasta zostały przypisane pomyślnie.");
         });
     }
 

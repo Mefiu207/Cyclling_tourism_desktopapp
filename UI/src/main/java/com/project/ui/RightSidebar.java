@@ -3,12 +3,15 @@ package com.project.ui;
 
 import com.project.springbootjavafx.services.*;
 import com.project.ui.buttons.CustomLeftButton;
+import com.project.ui.buttons.RightCenyButton;
 import com.project.ui.buttons.RightDeleteButton;
 
+import com.project.ui.buttons.RightMiastaWycieczekButton;
 import com.project.ui.buttons.adding.AddHoteleButton;
 import com.project.ui.buttons.adding.AddMiastaButton;
 
 import com.project.ui.buttons.adding.AddTypyWycieczekButton;
+import com.project.ui.buttons.adding.AddWycieczkiButton;
 import javafx.scene.layout.VBox;
 
 import lombok.Getter;
@@ -19,6 +22,7 @@ import org.springframework.stereotype.Component;
 public class RightSidebar {
 
     private VBox view;
+
 
 
     public RightSidebar() {
@@ -37,7 +41,7 @@ public class RightSidebar {
             case "Miasta":
                 view.getChildren().addAll(
                         new AddMiastaButton("Dodaj miasto", activeButton),
-                        new RightDeleteButton("Usuń miasto", activeButton)
+                        new RightDeleteButton<>("Usuń miasto", activeButton)
                 );
                 break;
 
@@ -52,7 +56,15 @@ public class RightSidebar {
             case "Typy wycieczek":
                 view.getChildren().addAll(
                         new AddTypyWycieczekButton("Dodaj Typ Wycieczki", activeButton),
-                        new RightDeleteButton<>("Usuń Typ Wycieczki", activeButton)
+                        new RightDeleteButton<>("Usuń Typ Wycieczki", activeButton),
+                        new RightCenyButton("Pokaż ceny wycieczki", activeButton),
+                        new RightMiastaWycieczekButton("Pokaż miata wycieczki", activeButton)
+                );
+                break;
+
+            case "Wycieczki":
+                view.getChildren().addAll(
+                        new AddWycieczkiButton("Dodaj wycieczke", activeButton)
                 );
                 break;
 

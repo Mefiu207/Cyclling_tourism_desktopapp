@@ -35,4 +35,9 @@ public class TypyWycieczek implements Models {
     @OneToMany(mappedBy = "typWycieczki")
     private List<Wycieczki> wycieczki;
 
+    @Override
+    public String toString() {
+        return typ;
+    }
+
 }
