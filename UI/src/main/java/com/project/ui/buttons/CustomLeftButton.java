@@ -72,7 +72,6 @@ public class CustomLeftButton<T, ID> extends Button {
         tableView.setItems(FXCollections.observableArrayList(data));
 
         mainContent.updateContent(tableView);
-
     }
 
 }

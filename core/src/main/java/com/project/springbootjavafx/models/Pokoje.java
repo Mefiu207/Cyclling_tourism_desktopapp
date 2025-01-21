@@ -9,7 +9,6 @@ import lombok.Setter;
 import java.util.List;
 
 @Entity
-@Table(name = "listy_hoteli")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -27,14 +26,20 @@ public class Pokoje implements Models{
     @OneToMany(mappedBy = "pokoj")
     private List<ListyHoteli> listyHoteli;
 
-
     @OneToMany(mappedBy = "pokoj")
     private List<Klienci> klienci;
 
+    @Column(name = "typ_pokoju")
     private String typPokoju;
+
+    @Column(name = "il_klientow")
+    private Integer ilKlientow;
+
+    @Column(name = "il_miejsc")
+    private Integer ilMiejsc;
 
     @Override
     public String toString(){
-        return "";
+        return typPokoju;
     }
 }

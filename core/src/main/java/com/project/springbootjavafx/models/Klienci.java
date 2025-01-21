@@ -37,8 +37,8 @@ public class Klienci implements Models{
     @Column(name = "nocleg_przed")
     private Boolean noclegPrzed;
 
-    @Column(name = "nocelg_po")
-    private Boolean nocelgPo;
+    @Column(name = "nocleg_po")
+    private Boolean noclegPo;
 
     private Boolean hb;
 

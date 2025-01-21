@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.ArrayList;
 
 import com.project.springbootjavafx.utils.Pair;
+import lombok.Getter;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.ManyToMany;
 
@@ -18,6 +18,8 @@ public abstract class AbstractServices<T, ID> {
 
     protected final JpaRepository<T, ID> repository;
     protected final Class<T> domainClass;
+
+    @Getter
     protected final Class<ID> idClass;
 
     /**
@@ -35,10 +37,6 @@ public abstract class AbstractServices<T, ID> {
     // Dodaje rekord do bazy. Do nadpisania w każdej klasie pochodnej
     public abstract T add(T model);
 
-    public Class<ID> getIdClass(){
-        return idClass;
-    }
-
     // Pamiętaj że w niektórych klasach pochodnych metode trzeba nadpisać !!!!!!!!!!!!!!!!!!!
     // Zwraca liste pol co daje mozliwosc uogolnienia klasy CustomLeftButton
     public ArrayList<Pair<String, String>> getFieldsTypes(){
@@ -50,7 +48,6 @@ public abstract class AbstractServices<T, ID> {
         for(Field field : fields){
             // Sprawdzenie, czy pole ma adnotację
             if(field.isAnnotationPresent(OneToMany.class) ||
-                    field.isAnnotationPresent(ManyToOne.class) ||
                     field.isAnnotationPresent(OneToOne.class) ||
                     field.isAnnotationPresent(ManyToMany.class)){
                 continue;
@@ -72,6 +69,10 @@ public abstract class AbstractServices<T, ID> {
     // Zwraca rekord po ID
     public T getById(ID id){
         return repository.findById(id).get();
+    }
+
+    public boolean existsById(ID id){
+        return repository.existsById(id);
     }
 
     // Usuwa rekord

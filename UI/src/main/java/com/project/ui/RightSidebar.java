@@ -1,17 +1,12 @@
 
 package com.project.ui;
 
+import com.project.springbootjavafx.models.Pokoje;
 import com.project.springbootjavafx.services.*;
-import com.project.ui.buttons.CustomLeftButton;
-import com.project.ui.buttons.RightCenyButton;
-import com.project.ui.buttons.RightDeleteButton;
+import com.project.ui.buttons.*;
 
-import com.project.ui.buttons.RightMiastaWycieczekButton;
-import com.project.ui.buttons.adding.AddHoteleButton;
-import com.project.ui.buttons.adding.AddMiastaButton;
+import com.project.ui.buttons.adding.*;
 
-import com.project.ui.buttons.adding.AddTypyWycieczekButton;
-import com.project.ui.buttons.adding.AddWycieczkiButton;
 import javafx.scene.layout.VBox;
 
 import lombok.Getter;
@@ -55,8 +50,8 @@ public class RightSidebar {
 
             case "Typy wycieczek":
                 view.getChildren().addAll(
-                        new AddTypyWycieczekButton("Dodaj Typ Wycieczki", activeButton),
-                        new RightDeleteButton<>("Usuń Typ Wycieczki", activeButton),
+                        new AddTypyWycieczekButton("Dodaj typ wycieczki", activeButton),
+                        new RightDeleteButton<>("Usuń typ wycieczki", activeButton),
                         new RightCenyButton("Pokaż ceny wycieczki", activeButton),
                         new RightMiastaWycieczekButton("Pokaż miata wycieczki", activeButton)
                 );
@@ -64,7 +59,22 @@ public class RightSidebar {
 
             case "Wycieczki":
                 view.getChildren().addAll(
-                        new AddWycieczkiButton("Dodaj wycieczke", activeButton)
+                        new AddWycieczkiButton("Dodaj wycieczke", activeButton),
+                        new RightDeleteButton<>("Usuń wycieczkę", activeButton)
+                );
+                break;
+
+            case "Pokoje":
+                view.getChildren().addAll(
+                        new AddPokojButton("Dodaj pokój", activeButton),
+                        new RightDeletePokojButton("Usuń pokój", (CustomLeftButton<Pokoje, Integer>) activeButton)
+                );
+                break;
+
+            case "Klienci":
+                view.getChildren().addAll(
+                        new AddKlientButton("Dodaj klienta", activeButton),
+                        new RightDeleteButton<>("Usuń klienci", activeButton)
                 );
                 break;
 

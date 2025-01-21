@@ -25,25 +25,26 @@ public class LeftSidebar {
 
     @PostConstruct
     private void initialize() {
-        // Inicjalizacja po wstrzyknięciu zależności
+
+        // Dostep do servicow
         MiastaService miastaService = SpringContextHolder.getContext().getBean(MiastaService.class);
         HoteleService hoteleService = SpringContextHolder.getContext().getBean(HoteleService.class);
         TypyWycieczekService typyWycieczekService = SpringContextHolder.getContext().getBean(TypyWycieczekService.class);
         WycieczkiService wycieczkiService = SpringContextHolder.getContext().getBean(WycieczkiService.class);
+        KlienciService klienciServices = SpringContextHolder.getContext().getBean(KlienciService.class);
+        PokojeService pokojeService = SpringContextHolder.getContext().getBean(PokojeService.class);
 
-
-
+        // Tworzenie rpzyciskow po lewej stronie
         CustomLeftButton<Miasta, String> miastaButton = new CustomLeftButton<>(miastaService, "Miasta");
-
         CustomLeftButton<Hotele, String> hoteleButton = new CustomLeftButton<>(hoteleService, "Hotele");
-
         CustomLeftButton<TypyWycieczek, String> typyWycieczekButton = new CustomLeftButton<>(typyWycieczekService, "Typy wycieczek");
-
         CustomLeftButton<Wycieczki, String> wycieczkiButton = new CustomLeftButton<> (wycieczkiService, "Wycieczki" );
+        CustomLeftButton<Pokoje, Integer> pokojeButton = new CustomLeftButton<>(pokojeService, "Pokoje");
+        CustomLeftButton<Klienci, Integer> klienciButton = new CustomLeftButton<>(klienciServices, "Klienci");
 
 
-
-        view.getChildren().addAll(miastaButton, hoteleButton, typyWycieczekButton, wycieczkiButton);
+        // Dodanie przyciskow do panelu
+        view.getChildren().addAll(miastaButton, hoteleButton, typyWycieczekButton, wycieczkiButton, pokojeButton, klienciButton);
     }
 
     public VBox getView() {

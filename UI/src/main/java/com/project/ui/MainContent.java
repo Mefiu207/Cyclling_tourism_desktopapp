@@ -28,15 +28,8 @@ public class MainContent {
 
     public <T> void updateContent(TableView<T> tableView) {
         this.tabelView = tableView;
-
         view.getChildren().clear();
-
-
-        if (tableView == null || tableView.getItems().isEmpty()) {
-            view.getChildren().add(new Text("Brak danych do wyświetlenia."));
-        } else {
-            view.getChildren().add(tableView);
-        }
+        view.getChildren().add(tableView);
     }
 
     // Scrolluje na dół tabeli

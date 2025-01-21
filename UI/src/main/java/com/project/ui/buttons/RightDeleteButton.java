@@ -11,10 +11,14 @@ import javafx.scene.layout.GridPane;
 
 public class RightDeleteButton<T, ID> extends Button {
 
-    private CustomLeftButton<T, ID> leftButton;
-    private AbstractServices services;
+    protected CustomLeftButton<T, ID> leftButton;
 
-    private Class<ID> clazz;
+    protected AbstractServices services;
+    protected Class<ID> clazz;
+
+    public RightDeleteButton(String text){
+        super(text);
+    }
 
     public RightDeleteButton(String text, CustomLeftButton<T, ID> leftButton) {
         super(text);
@@ -23,18 +27,16 @@ public class RightDeleteButton<T, ID> extends Button {
         this.leftButton = leftButton;
         this.services = leftButton.getServices();
 
-        // Bierzemy tym pod jakim przechowywane jest ID z services (pozwala nam operować na ID w postaci Stringa jak i Integera)
+        // Bierzemy pod jakim przechowywane jest ID z services (pozwala nam operować na ID w postaci Stringa jak i Integera)
         this.clazz = services.getIdClass();
-
-
 
         this.setOnAction(e -> onClick());
     }
 
-    private void onClick() {
+    protected void onClick() {
 
         Dialog<String> dialog = new Dialog<>();
-        dialog.setTitle("Usuń rekord z tabeli " + leftButton.getText());
+        dialog.setTitle("Usuń rekord z tabeli ");
         dialog.setHeaderText("ID (lub nazwa) obiektu do usunięcia (pierwsza kolumna)");
 
         ButtonType deleteButtonType = new ButtonType("Usuń", ButtonBar.ButtonData.OK_DONE);
@@ -66,6 +68,11 @@ public class RightDeleteButton<T, ID> extends Button {
         dialog.showAndWait().ifPresent(id -> {
             if (id.isEmpty()) {
                 showAlert(Alert.AlertType.ERROR, "Błąd", "ID nie może być puste.");
+                return;
+            }
+
+            if(!services.existsById(id)){
+                showAlert(Alert.AlertType.ERROR, "Błąd", "Rekord o dany ID nie istnieje");
                 return;
             }
             try {

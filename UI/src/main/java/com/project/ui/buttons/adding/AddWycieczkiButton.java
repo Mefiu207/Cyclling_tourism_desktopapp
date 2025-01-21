@@ -12,11 +12,8 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
-import javafx.util.converter.NumberStringConverter;
-import javafx.scene.control.cell.TextFieldTableCell;
 
-import java.math.BigDecimal;
+
 import java.time.LocalDate;
 
 public class AddWycieczkiButton extends Button {
@@ -73,14 +70,6 @@ public class AddWycieczkiButton extends Button {
         DatePicker poczatekDatePicker = new DatePicker();
         poczatekDatePicker.setPromptText("Data Początku");
 
-        DatePicker koniecDatePicker = new DatePicker();
-        koniecDatePicker.setPromptText("Data Końca");
-
-        TextField ilUczestnikowField = new TextField();
-        ilUczestnikowField.setPromptText("Liczba Uczestników");
-
-        TextField wplywField = new TextField();
-        wplywField.setPromptText("Wpływ (np. 1000.00)");
 
         // Dodanie pól do gridu
         grid.add(new Label("Nazwa Wycieczki:"), 0, 0);
@@ -89,12 +78,7 @@ public class AddWycieczkiButton extends Button {
         grid.add(typWycieczkiComboBox, 1, 1);
         grid.add(new Label("Data Początku:"), 0, 2);
         grid.add(poczatekDatePicker, 1, 2);
-        grid.add(new Label("Data Końca:"), 0, 3);
-        grid.add(koniecDatePicker, 1, 3);
-        grid.add(new Label("Liczba Uczestników:"), 0, 4);
-        grid.add(ilUczestnikowField, 1, 4);
-        grid.add(new Label("Wpływ:"), 0, 5);
-        grid.add(wplywField, 1, 5);
+
 
         dialog.getDialogPane().setContent(grid);
 
@@ -107,28 +91,22 @@ public class AddWycieczkiButton extends Button {
                 String wycieczkaName = wycieczkaField.getText().trim();
                 TypyWycieczek selectedTyp = typWycieczkiComboBox.getValue();
                 LocalDate poczatek = poczatekDatePicker.getValue();
-                LocalDate koniec = koniecDatePicker.getValue();
-                String ilUczestnikowStr = ilUczestnikowField.getText().trim();
-                String wplywStr = wplywField.getText().trim();
+
+                // Automatycznie ustawiamy datę końcową na podstawie długości danego typu wycieczki
+                LocalDate koniec = poczatekDatePicker.getValue().plusDays(typWycieczkiComboBox.getValue().getLiczba_nocy());
 
                 // Walidacja pól
-                if (wycieczkaName.isEmpty() || selectedTyp == null || poczatek == null || koniec == null
-                        || ilUczestnikowStr.isEmpty() || wplywStr.isEmpty()) {
+                if (wycieczkaName.isEmpty() || selectedTyp == null || poczatek == null || koniec == null) {
                     showAlert(Alert.AlertType.ERROR, "Błąd", "Wszystkie pola muszą być wypełnione.");
                     return null;
                 }
 
                 try {
-                    Integer ilUczestnikow = Integer.parseInt(ilUczestnikowStr);
-                    BigDecimal wplyw = new BigDecimal(wplywStr);
-
                     Wycieczki wycieczka = new Wycieczki();
                     wycieczka.setWycieczka(wycieczkaName);
                     wycieczka.setTypWycieczki(selectedTyp);
                     wycieczka.setPoczatek(poczatek);
                     wycieczka.setKoniec(koniec);
-                    wycieczka.setIlUczestinkow(ilUczestnikow);
-                    wycieczka.setWplyw(wplyw);
 
                     return wycieczka;
                 } catch (NumberFormatException ex) {
