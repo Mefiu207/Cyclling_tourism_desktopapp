@@ -25,7 +25,7 @@ public class Wycieczki implements Models {
     @JoinColumn(name = "typ_wycieczki")
     private TypyWycieczek typWycieczki;
 
-    @OneToMany(mappedBy = "wycieczka")
+    @OneToMany(mappedBy = "wycieczka", cascade = CascadeType.ALL)
     private List<Pokoje> pokoje;
 
     private LocalDate poczatek;
@@ -43,5 +43,9 @@ public class Wycieczki implements Models {
     @Override
     public String toString() {
         return wycieczka;
+    }
+
+    public boolean equals(Wycieczki other){
+        return other.wycieczka.equals(this.wycieczka);
     }
 }

@@ -5,12 +5,14 @@ import javafx.scene.control.TableView;
 import javafx.scene.text.Text;
 
 import javafx.scene.layout.StackPane;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class MainContent {
 
+    @Getter
     private StackPane view;
     private TableView<?> tabelView;
 
@@ -21,9 +23,6 @@ public class MainContent {
         // Ustawienie domyślnego komunikatu
         view.getChildren().add(new Text("Wybierz zakładkę z lewej strony"));
     }
-
-
-    public StackPane getView() { return view; }
 
 
     public <T> void updateContent(TableView<T> tableView) {

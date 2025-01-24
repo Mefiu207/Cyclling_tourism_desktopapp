@@ -1,15 +1,19 @@
 package com.project.ui.buttons.adding;
 
 import com.project.springbootjavafx.exceptions.WrongLetterException;
+
+import com.project.springbootjavafx.models.Ceny;
 import com.project.springbootjavafx.models.Klienci;
 import com.project.springbootjavafx.models.Pokoje;
 import com.project.springbootjavafx.models.Wycieczki;
+
 import com.project.springbootjavafx.services.KlienciService;
 import com.project.springbootjavafx.services.PokojeService;
 import com.project.springbootjavafx.services.WycieczkiService;
-import com.project.ui.MainContent;
+
 import com.project.ui.SpringContextHolder;
 import com.project.ui.buttons.CustomLeftButton;
+
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -18,6 +22,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -46,7 +51,7 @@ public class AddKlientButton extends Button {
 
 
         // Tworzenie pierwszego dialogu do wprowadzenia danych klienta
-        Dialog<Void> dialog = new Dialog<>();
+        Dialog<Boolean> dialog = new Dialog<>();
         dialog.setTitle("Dodaj Nowego Klienta");
         dialog.setHeaderText("Wprowadź dane nowego klienta.");
 
@@ -115,7 +120,7 @@ public class AddKlientButton extends Button {
         dialog.getDialogPane().setContent(grid);
 
         // Ustawienie fokusu na pierwszym polu
-        Platform.runLater(() -> imieField.requestFocus());
+        Platform.runLater(imieField::requestFocus);
 
         // Obsługa przycisku "Dalej"
         dialog.setResultConverter(dialogButton -> {
@@ -127,19 +132,19 @@ public class AddKlientButton extends Button {
                 // Walidacja pól
                 if (imie.isEmpty() || nazwisko.isEmpty() || wycieczka == null) {
                     showAlert(Alert.AlertType.ERROR, "Błąd", "Wszystkie pola muszą być wypełnione.");
-                    return null;
+                    return false;
                 }
 
-                return null; // Return null because we handle dialogs sequentially
+                return true; // Return null because we handle dialogs sequentially
             }
-            return null;
+            return false;
         });
 
         // Wyświetlenie pierwszego dialogu i obsługa wyniku
-        Optional<Void> result = dialog.showAndWait();
+        Optional<Boolean> result = dialog.showAndWait();
 
-        if (result.isPresent()) {
-            // Przechowywanie danych tymczasowych
+        if (result.isPresent() && result.get()) {
+        // Przechowywanie danych tymczasowych
             String tempImie = imieField.getText().trim();
             String tempNazwisko = nazwiskoField.getText().trim();
             Wycieczki tempWycieczka = wycieczkiComboBox.getValue();
@@ -158,6 +163,7 @@ public class AddKlientButton extends Button {
                     .filter(pokoj -> pokoj.getWycieczka().equals(tempWycieczka))
                     .filter(pokoj -> pokoj.getIlKlientow() < pokoj.getIlMiejsc())
                     .collect(Collectors.toList());
+
 
             if (dostepnePokoje.isEmpty()) {
                 showAlert(Alert.AlertType.INFORMATION, "Brak Dostępnych Pokoi",
@@ -180,7 +186,7 @@ public class AddKlientButton extends Button {
                     if (empty || pokoj == null) {
                         setText(null);
                     } else {
-                        setText("Pokój ID: " + pokoj.getId() + ", Typ: " + pokoj.getTypPokoju());
+                        setText("Typ: " + pokoj.getTypPokoju());
                     }
                 }
             });
@@ -192,7 +198,7 @@ public class AddKlientButton extends Button {
             roomDialog.getDialogPane().setContent(roomContent);
 
             // Ustawienie fokusu na ListView
-            Platform.runLater(() -> pokojeListView.requestFocus());
+            Platform.runLater(pokojeListView::requestFocus);
 
             // Obsługa przycisku "Dalej" w drugim dialogu
             roomDialog.setResultConverter(dialogButtonRoom -> {
@@ -253,22 +259,61 @@ public class AddKlientButton extends Button {
                             klient.setNoclegPrzed(noclegPrzed);
                             klient.setNoclegPo(noclegPo);
                             klient.setHb(hb);
+                            klient.setTypPokoju(selectedPokoj.getTypPokoju());
+                            klient.setDoZaplaty(BigDecimal.valueOf(0));
+
+
+                            // Ceny wycieczki na której jest klient
+                            Ceny ceny = klient.getWycieczka().getTypWycieczki().getCeny();
+
+                            switch(selectedPokoj.getIlMiejsc()){
+                                case 1:
+                                    klient.setDoZaplaty(ceny.getPok_1().add(klient.getDoZaplaty()));
+                                    break;
+                                case 2:
+                                    klient.setDoZaplaty(ceny.getPok_2().add(klient.getDoZaplaty()));
+                                    break;
+                                case 3:
+                                    klient.setDoZaplaty(ceny.getPok_3().add(klient.getDoZaplaty()));
+                                    break;
+                                case 4:
+                                    klient.setDoZaplaty(ceny.getPok_4().add(klient.getDoZaplaty()));
+                                    break;
+                            }
+
+                            if(klient.getUlga()){
+                                Double val = klient.getDoZaplaty().intValue() * (ceny.getUlga_dziecko() - 100)/100.0;
+                                klient.setDoZaplaty(BigDecimal.valueOf(val));
+                            }
+
+                            if(klient.getRower()){
+                                klient.setDoZaplaty(klient.getDoZaplaty().add(ceny.getRower()));
+                            }
+
+                            if(klient.getEBike()){
+                                klient.setDoZaplaty(klient.getDoZaplaty().add(ceny.getE_bike()));
+                            }
+
+                            if(klient.getNoclegPo()){
+                                klient.setDoZaplaty(klient.getDoZaplaty().add(ceny.getDodatkowa_noc()));
+                            }
+
+                            if(klient.getNoclegPrzed()){
+                                klient.setDoZaplaty(klient.getDoZaplaty().add(ceny.getDodatkowa_noc()));
+                            }
+
+                            if(klient.getHb()){
+                                klient.setDoZaplaty(klient.getDoZaplaty().add(ceny.getHb()));
+                            }
 
                             // Zapisanie klienta w bazie danych
                             try {
                                 klienciService.add(klient);
-
-                                // Aktualizacja liczby klientów w wybranym pokoju
-                                selectedPokoj.setIlKlientow(selectedPokoj.getIlKlientow() + 1);
-                                pokojeService.add(selectedPokoj);
-
-                                // Aktualizacja liczby uczestników w wycieczce
-                                tempWycieczka.setIlUczestinkow(tempWycieczka.getIlUczestinkow() + 1);
-                                wycieczkiService.add(tempWycieczka);
+                                leftButton.onClick();
 
                                 showAlert(Alert.AlertType.INFORMATION, "Sukces", "Klient został dodany pomyślnie.");
 
-                                leftButton.onClick();
+
 
                             } catch (WrongLetterException ex) {
                                 showAlert(Alert.AlertType.ERROR, "Błąd", "Wystąpił problem: " + ex.getMessage());

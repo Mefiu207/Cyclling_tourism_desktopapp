@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 
 @Setter
 @Getter
@@ -41,6 +43,9 @@ public class Klienci implements Models{
     private Boolean noclegPo;
 
     private Boolean hb;
+
+    @Column (name = "do_zaplaty")
+    private BigDecimal doZaplaty;
 
     @Override
     public String toString(){

@@ -14,6 +14,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public class AddWycieczkiButton extends Button {
@@ -107,6 +108,8 @@ public class AddWycieczkiButton extends Button {
                     wycieczka.setTypWycieczki(selectedTyp);
                     wycieczka.setPoczatek(poczatek);
                     wycieczka.setKoniec(koniec);
+                    wycieczka.setIlUczestinkow(0);
+                    wycieczka.setWplyw(BigDecimal.valueOf(0));
 
                     return wycieczka;
                 } catch (NumberFormatException ex) {

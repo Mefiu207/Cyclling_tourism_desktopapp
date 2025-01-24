@@ -6,15 +6,17 @@ import com.project.ui.buttons.CustomLeftButton;
 import com.project.springbootjavafx.models.*;
 import com.project.springbootjavafx.services.*;
 
+import lombok.Getter;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import jakarta.annotation.PostConstruct;
 
+@Getter
 @Component
 @DependsOn("springContextHolder")
 public class LeftSidebar {
 
-    private VBox view;
+    private final VBox view;
 
     public LeftSidebar() {
         // Tworzenie widoku tutaj, zależności jeszcze nie są wstrzyknięte
@@ -47,7 +49,4 @@ public class LeftSidebar {
         view.getChildren().addAll(miastaButton, hoteleButton, typyWycieczekButton, wycieczkiButton, pokojeButton, klienciButton);
     }
 
-    public VBox getView() {
-        return view;
-    }
 }

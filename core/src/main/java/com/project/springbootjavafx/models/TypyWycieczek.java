@@ -28,11 +28,11 @@ public class TypyWycieczek implements Models {
     private Ceny ceny;
 
     // Miasta danej wycieczki
-    @OneToMany(mappedBy = "typyWycieczek")
+    @OneToMany(mappedBy = "typyWycieczek", cascade = CascadeType.ALL)
     private List<MiastaWycieczek> miastaWycieczek;
 
     // Wycieczki dla danego typu
-    @OneToMany(mappedBy = "typWycieczki")
+    @OneToMany(mappedBy = "typWycieczki", cascade = CascadeType.ALL)
     private List<Wycieczki> wycieczki;
 
     @Override
