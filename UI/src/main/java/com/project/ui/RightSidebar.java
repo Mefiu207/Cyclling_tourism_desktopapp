@@ -67,7 +67,8 @@ public class RightSidebar {
             case "Pokoje":
                 view.getChildren().addAll(
                         new AddPokojButton("Dodaj pokój", activeButton),
-                        new RightDeletePokojButton("Usuń pokój", (CustomLeftButton<Pokoje, Integer>) activeButton)
+                        new RightDeletePokojButton("Usuń pokój", (CustomLeftButton<Pokoje, Integer>) activeButton),
+                        new AddListaHoteliButton("Dodaj listę hoteli")
                 );
                 break;
 

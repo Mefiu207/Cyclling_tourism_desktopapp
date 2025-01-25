@@ -7,6 +7,8 @@ import com.project.springbootjavafx.repositories.WycieczkiRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class WycieczkiService extends AbstractServices<Wycieczki, String> {
 
@@ -27,6 +29,5 @@ public class WycieczkiService extends AbstractServices<Wycieczki, String> {
         }
         return repository.save(wycieczka);
     }
-
 
 }
