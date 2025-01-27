@@ -14,6 +14,7 @@ import java.util.List;
 public class Hotele implements Models {
 
     @Id
+    @Column(name = "kod")
     private String kod;
 
     private String nazwa;
@@ -48,52 +49,4 @@ public class Hotele implements Models {
     public String toString() {
         return kod;
     }
-
-//    public void setKod(String kod) {
-//        this.kod = kod;
-//    }
-//
-//    public void setNazwa(String nazwa) {
-//        this.nazwa = nazwa;
-//    }
-//
-//    public void setMiasto(Miasta miasto) {
-//        this.miasto = miasto;
-//    }
-//
-//    public void setAdres(String adres) {
-//        this.adres = adres;
-//    }
-//
-//    public void setMail(String email) {
-//        this.mail = email;
-//    }
-//
-//    public void setNr_tel(String telefon) {
-//        this.nr_tel = telefon;
-//    }
-//
-//    public String getKod() {
-//        return this.kod;
-//    }
-//
-//    public String getNazwa() {
-//        return this.nazwa;
-//    }
-//
-//    public Miasta getMiasto() {
-//        return this.miasto;
-//    }
-//
-//    public String getAdres() {
-//        return this.adres;
-//    }
-//
-//    public String getMail() {
-//        return this.mail;
-//    }
-//
-//    public String getNr_tel() {
-//        return this.nr_tel;
-//    }
 }

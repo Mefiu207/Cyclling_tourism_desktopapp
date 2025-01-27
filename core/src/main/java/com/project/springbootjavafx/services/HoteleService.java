@@ -3,9 +3,12 @@ package com.project.springbootjavafx.services;
 import com.project.springbootjavafx.exceptions.DuplicatedEntityExceptionn;
 import com.project.springbootjavafx.exceptions.WrongCodeLengthException;
 import com.project.springbootjavafx.models.Hotele;
+import com.project.springbootjavafx.models.Miasta;
 import com.project.springbootjavafx.repositories.HoteleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class HoteleService extends AbstractServices<Hotele, String>{
@@ -30,5 +33,9 @@ public class HoteleService extends AbstractServices<Hotele, String>{
         }
 
         return hoteleRepository.save(hotel);
+    }
+
+    public List<Hotele> getHoteleMiasta(Miasta miasto){
+        return hoteleRepository.getHoteleByMiasto(miasto.getMiasto());
     }
 }

@@ -1,11 +1,7 @@
 package com.project.ui.buttons.adding;
 
-import com.project.springbootjavafx.models.ListyHoteli;
-import com.project.springbootjavafx.models.Pokoje;
-import com.project.springbootjavafx.models.TypyWycieczek;
-import com.project.springbootjavafx.models.Wycieczki;
-import com.project.springbootjavafx.services.PokojeService;
-import com.project.springbootjavafx.services.WycieczkiService;
+import com.project.springbootjavafx.models.*;
+import com.project.springbootjavafx.services.*;
 import com.project.ui.SpringContextHolder;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -13,10 +9,12 @@ import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 
-import com.project.springbootjavafx.services.ListyHoteliService;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
+import org.controlsfx.control.textfield.AutoCompletionBinding;
+import org.controlsfx.control.textfield.TextFields;
+
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -27,12 +25,18 @@ public class AddListaHoteliButton extends Button {
     private final ListyHoteliService listyHoteliService;
     private final WycieczkiService wycieczkiService;
     private final PokojeService pokojeService;
+    private final TypyWycieczekService typyWycieczekService;
+    private final HoteleService hoteleService;
+
 
     public AddListaHoteliButton(String name) {
         super(name);
+
         this.listyHoteliService = SpringContextHolder.getContext().getBean(ListyHoteliService.class);
         this.wycieczkiService = SpringContextHolder.getContext().getBean(WycieczkiService.class);
         this.pokojeService = SpringContextHolder.getContext().getBean(PokojeService.class);
+        this.typyWycieczekService = SpringContextHolder.getContext().getBean(TypyWycieczekService.class);
+        this.hoteleService = SpringContextHolder.getContext().getBean(HoteleService.class);
 
         this.setOnAction(e -> onClick());
     }
@@ -40,86 +44,129 @@ public class AddListaHoteliButton extends Button {
     public void onClick(){
 
         Wycieczki wycieczka = wybierzWycieczke();
-
         List<Pokoje> wybranePokoje = wybierzPokoje(wycieczka);
 
-        // Jak nie ma wolnych  to nic
         if(wybranePokoje == null) return;
 
         List<ListyHoteli> listaHoteli = wybierzHotele(wybranePokoje);
+
+        if(listaHoteli == null) return;
+
+        for(ListyHoteli lista : listaHoteli){
+
+
+
+            listyHoteliService.add(lista);
+        }
 
         showAlert(Alert.AlertType.INFORMATION, "Sukces", "Dodano listy hoteli");
     }
 
     private List<ListyHoteli> wybierzHotele(List<Pokoje> wybranePokoje) {
-//
-//        Dialog<ListyHoteli> dialog = new Dialog<>();
-//        dialog.setTitle("Listy hoteli");
-//        dialog.setHeaderText("Ustaw hotele dla nocy wycieczki");
-//
-//        ButtonType confirmButton = new ButtonType("Dalej", ButtonBar.ButtonData.OK_DONE);
-//        dialog.getDialogPane().getButtonTypes().addAll(confirmButton, ButtonType.CANCEL);
-//
-//
-//        GridPane grid = new GridPane();
-//        grid.setHgap(10);
-//        grid.setVgap(10);
-//
-//        TypyWycieczek typWycieczki = wybranePokoje.get(0).getWycieczka().getTypWycieczki();
-//
-//        // Iteracja po ilości nocy danej wycieczki
-//        for(int i = 0; i < typWycieczki.getLiczba_nocy(); i++){
-//
-//            Label miastoLabel = new Label(typWycieczki.getMiastaWycieczek().);
-//
-//            //Tutaj dodamy Widok po stronie bazy danych
-//
-//
-//            TextField hotelField = new TextField();
-//            hotelField.setPromptText("Kod hotelu");
-//
-//
-//        }
-//
-//        // Przykładowo, dla każdej nocy/pokoju tworzysz wiersz z nazwą miasta i polem hotelu
-//        for (int i = 0; i < wybranePokoje.size(); i++) {
-//            Pokoje pokoj = wybranePokoje.get(i);
-//
-//            // Załóżmy, że miasto/noc wyciągamy z getMiasto() i getNoc()
-//            Label miastoLabel = new Label("Miasto: " + pokoj.getMiasto() + " (noc " + pokoj.getNoc() + ")");
-//            TextField hotelField = new TextField();
-//            hotelField.setPromptText("Kod hotelu");
-//
-//            // Autouzupełnianie (przykład minimalny – filtr w textProperty)
-//            List<String> wszystkieHotele = listyHoteliService.getAllKodHoteli(); // np. pobiera listę dostępnych kodów
-//            hotelField.textProperty().addListener((obs, oldV, newV) -> {
-//                if (newV != null && !newV.isEmpty()) {
-//                    // Filtruj listę hotelów i ewentualnie wyświetl w popupie
-//                    // (Implementacja zależna od Twojego sposobu autouzupełniania)
-//                }
-//            });
-//
-//            grid.add(miastoLabel, 0, i);
-//            grid.add(hotelField, 1, i);
-//        }
-//
-//        dialog.getDialogPane().setContent(grid);
-//
-//        // Ustawiamy ResultConverter, żeby zebrać dane i stworzyć obiekt ListyHoteli
-//        dialog.setResultConverter(button -> {
-//            if (button == confirmButton) {
-//                ListyHoteli listy = new ListyHoteli();
-//                // Tutaj odczytujemy wartości hotelField (np. z grid.getChildren())
-//                // i ustawiamy w listy
-//                return listy;
-//            }
-//            return null;
-//        });
-//
-//        // Wyświetlenie dialogu
-//        Optional<ListyHoteli> result = dialog.showAndWait();
-//        return result.orElse(null);
-        return null;
+
+        Dialog<List<ListyHoteli>> dialog = new Dialog<>();
+        dialog.setTitle("Listy hoteli");
+        dialog.setHeaderText("Ustaw hotele dla nocy wycieczki");
+
+        ButtonType confirmButton = new ButtonType("Dalej", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(confirmButton, ButtonType.CANCEL);
+
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+
+        // Typ wycieczki i maista danej wycieczki
+        TypyWycieczek typWycieczki = wybranePokoje.get(0).getWycieczka().getTypWycieczki();
+        List<MiastaWycieczek> miastaWycieczki = typyWycieczekService.getMiastaWycieczki(typWycieczki);
+
+        // Tu przechowujemy wybrane hotele
+        List<Hotele> hoteleWycieczki = new ArrayList<>(Collections.nCopies(miastaWycieczki.size(), null));
+
+        // Iteracja po ilosci nocy danej wycieczki i dodawanie hoteli + autouzupelnienei
+        for (int i = 0; i < miastaWycieczki.size(); i++) {
+
+            Label miastoLabel = new Label(miastaWycieczki.get(i).getMiasta().getMiasto());
+            TextField hotelField = new TextField();
+            hotelField.setPromptText("Kod hotelu");
+
+            List<Hotele> hoteleMiasta = hoteleService.getHoteleMiasta(miastaWycieczki.get(i).getMiasta());
+            ObservableList<Hotele> observableHotele = FXCollections.observableArrayList(hoteleMiasta);
+
+            ComboBox<Hotele> hotelCombo = new ComboBox<>(observableHotele);
+            hotelCombo.setItems(observableHotele);
+            hotelCombo.setPromptText("Wybierz lub wpisz hotel");
+            hotelCombo.setEditable(true);
+
+
+            hotelCombo.setConverter(new StringConverter<Hotele>() {
+                @Override
+                public String toString(Hotele hotele) {
+                    return hotele == null ? "" : hotele.getKod();
+                }
+
+                @Override
+                public Hotele fromString(String s) {
+                    return hoteleMiasta.stream()
+                            .filter(hotel -> hotel.getKod().equalsIgnoreCase(s))
+                            .findFirst()
+                            .orElse(null);
+                }
+            });
+
+            hotelCombo.getEditor().textProperty().addListener((obs, oldVal, newVal) -> {
+                if (newVal == null || newVal.isEmpty()) {
+                    hotelCombo.hide();
+                    hotelCombo.setItems(observableHotele);
+                } else {
+                    List<Hotele> filtered = hoteleMiasta.stream()
+                            .filter(hotel -> hotel.toString().toLowerCase().contains(newVal.toLowerCase()))
+                            .collect(Collectors.toList());
+                    hotelCombo.setItems(FXCollections.observableArrayList(filtered));
+                    hotelCombo.show();
+                }
+            });
+
+            final int index = i;
+            hotelCombo.valueProperty().addListener((a, old, New) -> {
+                hoteleWycieczki.set(index, New);
+            });
+
+
+            grid.add(miastoLabel, 0, i);
+            grid.add(hotelCombo, 1, i);
+        }
+
+        dialog.getDialogPane().setContent(grid);
+
+
+        dialog.setResultConverter(buttonType -> {
+            if(buttonType == confirmButton) {
+                List<ListyHoteli> listyDoZwrotu = new ArrayList<>();
+
+                // Dla każdego pokoju tworzymy listy wybranych hoteli
+                for (Pokoje pokoje : wybranePokoje) {
+
+                    // Dla każdego pokoju każde miasto
+                    for (int j = 0; j < hoteleWycieczki.size(); j++) {
+                        ListyHoteli nowaLista = new ListyHoteli();
+
+                        nowaLista.setPokoj(pokoje);
+                        nowaLista.setMiastoWycieczki(miastaWycieczki.get(j));
+                        nowaLista.setHotel(hoteleWycieczki.get(j));
+
+                        listyDoZwrotu.add(nowaLista);
+                    }
+                }
+                return listyDoZwrotu;
+            }
+            return null;
+        });
+
+
+        Optional<List<ListyHoteli>> optionalResult = dialog.showAndWait();
+
+        return optionalResult.orElse(null);
     }
 
 

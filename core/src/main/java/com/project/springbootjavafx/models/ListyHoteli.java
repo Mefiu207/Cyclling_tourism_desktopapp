@@ -16,8 +16,7 @@ import lombok.Setter;
 public class ListyHoteli implements Models{
 
     @EmbeddedId
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    ListyHoteliKey id;
+    ListyHoteliKey id = new ListyHoteliKey();
 
     @ManyToOne(fetch = FetchType.EAGER)
     @MapsId("pokoj")

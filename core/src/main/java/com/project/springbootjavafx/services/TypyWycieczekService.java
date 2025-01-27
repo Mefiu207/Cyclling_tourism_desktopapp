@@ -2,10 +2,14 @@ package com.project.springbootjavafx.services;
 
 import com.project.springbootjavafx.exceptions.DuplicatedEntityExceptionn;
 import com.project.springbootjavafx.exceptions.WrongCodeLengthException;
+import com.project.springbootjavafx.models.Miasta;
+import com.project.springbootjavafx.models.MiastaWycieczek;
 import com.project.springbootjavafx.models.TypyWycieczek;
 import com.project.springbootjavafx.repositories.TypyWycieczekRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class TypyWycieczekService extends AbstractServices<TypyWycieczek, String>{
@@ -31,5 +35,9 @@ public class TypyWycieczekService extends AbstractServices<TypyWycieczek, String
         }
 
         return typy_wycieczekRepository.save(typy_wycieczek);
+    }
+
+    public List<MiastaWycieczek> getMiastaWycieczki(TypyWycieczek typWycieczki){
+        return typy_wycieczekRepository.getMiastaWycieczki(typWycieczki.getTyp());
     }
 }
