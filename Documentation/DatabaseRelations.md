@@ -2,7 +2,7 @@
 
 ## Diagram ERD dla bazy
 
-![ERD](Turystyka_rowerowa.png "Diagram ERD")
+![ERD](ERD_bird.png "Diagram ERD")
 
 
 ## Tabele
@@ -29,15 +29,15 @@ Ceny na każdej wycieczce
 |---------------------|------------|----------------|-------------------------------------------|
 | id                 | INTEGER    | PRIMARY KEY    | Unikalny identyfikator rekordu            |
 | typ_wycieczki      | VARCHAR(3) | FOREIGN KEY    | Klucz obcy do tabeli `typy_wycieczek`     |
-| pok_1              | MONEY      | NOT NULL       | Cena za 1-osobowy pokój od osoby        |
-| pok_2              | MONEY      | NOT NULL       | Cena za 2-osobowy pokój        od osoby           |
-| pok_3              | MONEY      | NOT NULL       | Cena za 3-osobowy pokój      od osoby             |
-| pok_4              | MONEY      | NOT NULL       | Cena za 4-osobowy pokój     od osoby              |
+| pok_1              | NUMERIC(10, 2)    | NOT NULL       | Cena za 1-osobowy pokój od osoby        |
+| pok_2              | NUMERIC(10, 2)    | NOT NULL       | Cena za 2-osobowy pokój        od osoby           |
+| pok_3              | NUMERIC(10, 2)    | NOT NULL       | Cena za 3-osobowy pokój      od osoby             |
+| pok_4              | NUMERIC(10, 2)    | NOT NULL       | Cena za 4-osobowy pokój     od osoby              |
 | ulga_dziecko       | INTEGER    |                | Ulga dla dzieci jako wartosc w liczniku dzielenia przez 100     |
-| rower              | MONEY      |                | Koszt wynajmu roweru                      |
-| e_bike             | MONEY      |                | Koszt wynajmu roweru elektrycznego        |
-| dodatkowa_noc      | MONEY      |                | Koszt dodatkowego noclegu                 |
-| hb                 | MONEY      |                | Cena opcji "half-board" (śniadanie + kolacja) |
+| rower              | NUMERIC(10, 2)    |                | Koszt wynajmu roweru                      |
+| e_bike             | NUMERIC(10, 2)    |                | Koszt wynajmu roweru elektrycznego        |
+| dodatkowa_noc      | NUMERIC(10, 2)    |                | Koszt dodatkowego noclegu                 |
+| hb                 | NUMERIC(10, 2)    |                | Cena opcji "half-board" (śniadanie + kolacja) |
 
 ---
 
@@ -115,6 +115,9 @@ Lista hoteli dla danego pokoju z danej wycieczki
 | id             | INTEGER      | PRIMARY KEY    | Unikalny identyfikator pokoju     |
 | wycieczka      | VARCHAR(5)   | FOREIGN KEY    | Wycieczka z tabeli `wycieczki`    |
 | typ_pokoju     | VARCHAR(3)   | NOT NULL       | Typ pokoju (np. 1-os., 2-os.)     |
+| il_klientow | INTEGER |  | obecna ilość osób w pokoju |
+| il_miejsc |  INTEGER |  | pojemność pokoku|
+| czy_lista_hoteli | BOOLEAN |   | prawda jeśli dla pokoju jest ustawiona lista hoteli|
 
 ---
 
@@ -136,5 +139,6 @@ Klienci wyceiczek z wszystkimi potrzebnymi informacjami
 | nocleg_przed   | BOOLEAN      |                | Czy klient ma nocleg przed wycieczką? |
 | nocleg_po      | BOOLEAN      |                | Czy klient ma nocleg po wycieczce? |
 | hb             | BOOLEAN      |                | Czy klient wybrał opcję half-board? |
+| do_zaplaty | numeric(10, 2) |  | Koszt dla danego klienta |
 
 ---
