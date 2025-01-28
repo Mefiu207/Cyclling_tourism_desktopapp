@@ -39,7 +39,7 @@ public class Pokoje implements Models{
     private Integer ilMiejsc;
 
     @Column(name = "czy_lista_hoteli")
-    private Boolean listaHoteli = false;
+    private Boolean listaHoteli;
 
     @Override
     public String toString(){

@@ -2,6 +2,8 @@
 package com.project.ui;
 
 import javafx.scene.control.TableView;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 import javafx.scene.layout.StackPane;
@@ -29,6 +31,11 @@ public class MainContent {
         this.tabelView = tableView;
         view.getChildren().clear();
         view.getChildren().add(tableView);
+    }
+
+    public void updateForPane(BorderPane box){
+        view.getChildren().clear();
+        view.getChildren().add(box);
     }
 
     // Scrolluje na dół tabeli

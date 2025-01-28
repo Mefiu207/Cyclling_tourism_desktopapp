@@ -68,7 +68,9 @@ public class RightSidebar {
                 view.getChildren().addAll(
                         new AddPokojButton("Dodaj pokój", activeButton),
                         new RightDeletePokojButton("Usuń pokój", (CustomLeftButton<Pokoje, Integer>) activeButton),
-                        new AddListaHoteliButton("Dodaj listę hoteli")
+                        new AddListaHoteliButton("Dodaj listę hoteli", activeButton),
+                        new RightDeleteListaHoteliButton("Usuń listy hoteli", activeButton),
+                        new ListaHoteliShowButton("Pokaż listę hoteli")
                 );
                 break;
 

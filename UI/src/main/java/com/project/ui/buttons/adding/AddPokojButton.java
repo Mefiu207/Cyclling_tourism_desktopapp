@@ -130,6 +130,7 @@ public class AddPokojButton extends Button {
                 Pokoje pokoj = new Pokoje();
                 pokoj.setWycieczka(selectedWycieczka);
                 pokoj.setTypPokoju(typPokoju);
+                pokoj.setListaHoteli(false);
 
 
                 // Sprawdzamy rozmiar pokoju w zależności od nazwy

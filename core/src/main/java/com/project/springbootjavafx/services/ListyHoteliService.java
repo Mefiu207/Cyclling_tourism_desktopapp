@@ -2,7 +2,9 @@ package com.project.springbootjavafx.services;
 
 import com.project.springbootjavafx.models.ListyHoteli;
 import com.project.springbootjavafx.models.ListyHoteliKey;
+import com.project.springbootjavafx.models.Pokoje;
 import com.project.springbootjavafx.repositories.ListyHoteliRepository;
+import jakarta.transaction.Transactional;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,11 @@ public class ListyHoteliService extends AbstractServices<ListyHoteli, ListyHotel
     @Override
     public ListyHoteli add(ListyHoteli entity) {
         return repository.save(entity);
+    }
+
+    @Transactional
+    public void usunDlaPokoju(Pokoje pokoj){
+        repository.deleteByPokoj(pokoj.getId());
     }
 
 }

@@ -1,176 +1,56 @@
-package com.project.ui.buttons.adding;
+package com.project.ui.buttons;
 
-import com.project.springbootjavafx.models.*;
-import com.project.springbootjavafx.services.*;
+import com.project.springbootjavafx.models.Pokoje;
+import com.project.springbootjavafx.models.Wycieczki;
+import com.project.springbootjavafx.services.ListyHoteliService;
+import com.project.springbootjavafx.services.PokojeService;
+import com.project.springbootjavafx.services.WycieczkiService;
 import com.project.ui.SpringContextHolder;
-import com.project.ui.buttons.CustomLeftButton;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
-import org.controlsfx.control.textfield.AutoCompletionBinding;
-import org.controlsfx.control.textfield.TextFields;
-
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-
-public class AddListaHoteliButton extends Button {
+public class RightDeleteListaHoteliButton extends Button {
 
     private final ListyHoteliService listyHoteliService;
     private final WycieczkiService wycieczkiService;
     private final PokojeService pokojeService;
-    private final TypyWycieczekService typyWycieczekService;
-    private final HoteleService hoteleService;
     private final CustomLeftButton<?, ?> leftButton;
 
-    public AddListaHoteliButton(String name, CustomLeftButton<?, ?> leftButton) {
+
+    public RightDeleteListaHoteliButton(String name, CustomLeftButton<?, ?> leftButton) {
         super(name);
 
         this.listyHoteliService = SpringContextHolder.getContext().getBean(ListyHoteliService.class);
         this.wycieczkiService = SpringContextHolder.getContext().getBean(WycieczkiService.class);
         this.pokojeService = SpringContextHolder.getContext().getBean(PokojeService.class);
-        this.typyWycieczekService = SpringContextHolder.getContext().getBean(TypyWycieczekService.class);
-        this.hoteleService = SpringContextHolder.getContext().getBean(HoteleService.class);
 
         this.leftButton = leftButton;
 
         this.setOnAction(e -> onClick());
     }
 
-    public void onClick(){
+    public void  onClick(){
 
         Wycieczki wycieczka = wybierzWycieczke();
-        List<Pokoje> wybranePokoje = wybierzPokoje(wycieczka);
+        List<Pokoje> pokoje = wybierzPokoje(wycieczka);
 
-        if(wybranePokoje == null) return;
+        if(pokoje == null) return;
 
-        List<ListyHoteli> listaHoteli = wybierzHotele(wybranePokoje);
+        pokoje.forEach(listyHoteliService::usunDlaPokoju);
 
-        if(listaHoteli == null) return;
+        pokojeService.setListaHoteliFalse(pokoje);
 
-
-        // Dodajemy lsity hoteli
-        listaHoteli.forEach(listyHoteliService::add);
-
-        pokojeService.setListaHoteliTrue(wybranePokoje);
-
-
-        showAlert(Alert.AlertType.INFORMATION, "Sukces", "Dodano listy hoteli");
+        showAlert(Alert.AlertType.INFORMATION, "Sukces", "Usunięto listy hoteli");
         leftButton.onClick();
-    }
-
-    private List<ListyHoteli> wybierzHotele(List<Pokoje> wybranePokoje) {
-
-        Dialog<List<ListyHoteli>> dialog = new Dialog<>();
-        dialog.setTitle("Listy hoteli");
-        dialog.setHeaderText("Ustaw hotele dla nocy wycieczki");
-
-        ButtonType confirmButton = new ButtonType("Dalej", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().addAll(confirmButton, ButtonType.CANCEL);
-
-
-        GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-
-        // Typ wycieczki i maista danej wycieczki
-        TypyWycieczek typWycieczki = wybranePokoje.get(0).getWycieczka().getTypWycieczki();
-        List<MiastaWycieczek> miastaWycieczki = typyWycieczekService.getMiastaWycieczki(typWycieczki);
-
-        // Tu przechowujemy wybrane hotele
-        List<Hotele> hoteleWycieczki = new ArrayList<>(Collections.nCopies(miastaWycieczki.size(), null));
-
-        // Iteracja po ilosci nocy danej wycieczki i dodawanie hoteli + autouzupelnienei
-        for (int i = 0; i < miastaWycieczki.size(); i++) {
-
-            Label miastoLabel = new Label(miastaWycieczki.get(i).getMiasta().getMiasto());
-            TextField hotelField = new TextField();
-            hotelField.setPromptText("Kod hotelu");
-
-            List<Hotele> hoteleMiasta = hoteleService.getHoteleMiasta(miastaWycieczki.get(i).getMiasta());
-            ObservableList<Hotele> observableHotele = FXCollections.observableArrayList(hoteleMiasta);
-
-            ComboBox<Hotele> hotelCombo = new ComboBox<>(observableHotele);
-            hotelCombo.setItems(observableHotele);
-            hotelCombo.setPromptText("Wybierz lub wpisz hotel");
-            hotelCombo.setEditable(true);
-
-
-            hotelCombo.setConverter(new StringConverter<Hotele>() {
-                @Override
-                public String toString(Hotele hotele) {
-                    return hotele == null ? "" : hotele.getKod();
-                }
-
-                @Override
-                public Hotele fromString(String s) {
-                    return hoteleMiasta.stream()
-                            .filter(hotel -> hotel.getKod().equalsIgnoreCase(s))
-                            .findFirst()
-                            .orElse(null);
-                }
-            });
-
-            hotelCombo.getEditor().textProperty().addListener((obs, oldVal, newVal) -> {
-                if (newVal == null || newVal.isEmpty()) {
-                    hotelCombo.hide();
-                    hotelCombo.setItems(observableHotele);
-                } else {
-                    List<Hotele> filtered = hoteleMiasta.stream()
-                            .filter(hotel -> hotel.toString().toLowerCase().contains(newVal.toLowerCase()))
-                            .collect(Collectors.toList());
-                    hotelCombo.setItems(FXCollections.observableArrayList(filtered));
-                    hotelCombo.show();
-                }
-            });
-
-            final int index = i;
-            hotelCombo.valueProperty().addListener((a, old, New) -> {
-                hoteleWycieczki.set(index, New);
-            });
-
-
-            grid.add(miastoLabel, 0, i);
-            grid.add(hotelCombo, 1, i);
-        }
-
-        dialog.getDialogPane().setContent(grid);
-
-
-        dialog.setResultConverter(buttonType -> {
-            if(buttonType == confirmButton) {
-                List<ListyHoteli> listyDoZwrotu = new ArrayList<>();
-
-                // Dla każdego pokoju tworzymy listy wybranych hoteli
-                for (Pokoje pokoje : wybranePokoje) {
-
-                    // Dla każdego pokoju każde miasto
-                    for (int j = 0; j < hoteleWycieczki.size(); j++) {
-                        ListyHoteli nowaLista = new ListyHoteli();
-
-                        nowaLista.setPokoj(pokoje);
-                        nowaLista.setMiastoWycieczki(miastaWycieczki.get(j));
-                        nowaLista.setHotel(hoteleWycieczki.get(j));
-
-                        listyDoZwrotu.add(nowaLista);
-                    }
-                }
-                return listyDoZwrotu;
-            }
-            return null;
-        });
-
-
-        Optional<List<ListyHoteli>> optionalResult = dialog.showAndWait();
-
-        return optionalResult.orElse(null);
     }
 
 
@@ -178,16 +58,16 @@ public class AddListaHoteliButton extends Button {
 
         Dialog<List<Pokoje>> dialog = new Dialog<>();
         dialog.setTitle("Wybierz pokoje");
-        dialog.setHeaderText("Wybierz pokoje dla których chcesz stworzyć listę hoteli");
+        dialog.setHeaderText("Wybierz pokoje dla których chcesz usunąć listę hoteli");
 
         ButtonType nextRoomButtonType = new ButtonType("Dalej", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(nextRoomButtonType, ButtonType.CANCEL);
 
-        List<Pokoje> dostepnePokoje = pokojeService.getPokojeWycieczki(wycieczka);
+        List<Pokoje> dostepnePokoje = pokojeService.getPokojeZListami(wycieczka);
 
         if (dostepnePokoje.isEmpty()) {
             showAlert(Alert.AlertType.INFORMATION, "Brak Dostępnych Pokoi",
-                    "Dla wybranej wycieczki nie ma dostępnych pokoi.");
+                    "Dla wybranej wycieczki nie ma dostępnych pokoi z listami hoteli.");
             return null;
         }
 
@@ -263,12 +143,11 @@ public class AddListaHoteliButton extends Button {
         return result.orElse(null);
     }
 
-
     private Wycieczki wybierzWycieczke(){
 
         Dialog<Wycieczki> dialog = new Dialog<>();
         dialog.setTitle("Wybór wycieczki");
-        dialog.setHeaderText("Wybierz wycieczkę dla której chcesz stworzyć listę hoteli");
+        dialog.setHeaderText("Wybierz wycieczkę dla której chcesz usunąć listy hoteli");
 
         ButtonType nextButtonType = new ButtonType("Dalej", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(nextButtonType, ButtonType.CANCEL);
@@ -333,4 +212,6 @@ public class AddListaHoteliButton extends Button {
             alert.showAndWait();
         });
     }
+
+
 }
