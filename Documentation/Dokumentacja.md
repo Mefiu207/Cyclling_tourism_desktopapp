@@ -10,12 +10,6 @@ Fianlny produkt ma zapenwniać spójność danych oraz usprawnienie sposobu obs�
 ### Wymagania użytkownika oraz funkcje
 Program pozwala ustawić wycieczki o podanej trasie wraz z wyborem miast przez które przechodzi dana wycieczke. Można dodawać hotele dla danych miast i tworzyć listy hoteli dla klientów, a wpływ dla danej wycieczki liczony jest automatycznie.
 
-
-## Diagram ERD dla bazy
-
-![ERD](ERD_bird.png "Diagram ERD")
-
-
 ## Tabele
 
 ---
