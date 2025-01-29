@@ -272,6 +272,26 @@ CREATE TRIGGER on_delete_klient_ceny AFTER DELETE
     ON klienci FOR EACH ROW
 EXECUTE FUNCTION update_ceny_on_delete();
 ```
+### Widok zwracający dane potrzebne do listy hoteli
+```
+CREATE OR REPLACE VIEW v_lista_nocy_hoteli AS
+SELECT
+    mw.nr_nocy AS noc,
+    ( wy.poczatek + (mw.nr_nocy - 1) * INTERVAL '1 day' ) AS data,
+    m.miasto AS miasto,
+    h.nazwa AS hotel
+FROM listy_hoteli lh
+         JOIN pokoje p
+              ON lh.pokoj = p.id
+         JOIN wycieczki wy
+              ON p.wycieczka = wy.wycieczka
+         JOIN miasta_wycieczek mw
+              ON lh.miasto_wycieczki = mw.id
+         JOIN miasta m
+              ON mw.miasto = m.miasto
+         JOIN hotele h
+              ON lh.hotel = h.kod;
+```
 
 ## Użyta technologia i opis użytkowania
 

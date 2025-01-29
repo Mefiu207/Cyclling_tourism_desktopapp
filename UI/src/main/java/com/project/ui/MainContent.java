@@ -33,10 +33,6 @@ public class MainContent {
         view.getChildren().add(tableView);
     }
 
-    public void updateForPane(BorderPane box){
-        view.getChildren().clear();
-        view.getChildren().add(box);
-    }
 
     // Scrolluje na dół tabeli
     public <T> void scrollToBottom(){

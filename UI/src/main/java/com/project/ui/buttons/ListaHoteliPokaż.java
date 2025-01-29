@@ -1,103 +1,79 @@
 package com.project.ui.buttons;
 
-import com.project.springbootjavafx.models.*;
-import com.project.springbootjavafx.services.KlienciService;
+import com.project.springbootjavafx.models.Klienci;
+import com.project.springbootjavafx.models.ListaNocyHoteli;
+import com.project.springbootjavafx.models.Pokoje;
+import com.project.springbootjavafx.services.ListaNocyHoteliService;
 import com.project.springbootjavafx.services.PokojeService;
 import com.project.ui.MainContent;
 import com.project.ui.SpringContextHolder;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
 
-import java.time.LocalDate;
 import java.util.*;
 
-public class ListaHoteliShowButton extends Button{
+public class ListaHoteliPokaż extends Button {
+
 
     private final PokojeService pokojeService;
-    private final KlienciService klienciService;
+    private final ListaNocyHoteliService listaNocyHoteliService;
     private final MainContent mainContent;
-    
-    
-    public ListaHoteliShowButton(String name){
+
+
+    public ListaHoteliPokaż(String name){
         super(name);
 
         this.pokojeService = SpringContextHolder.getContext().getBean(PokojeService.class);
-        this.klienciService = SpringContextHolder.getContext().getBean(KlienciService.class);
         this.mainContent = SpringContextHolder.getContext().getBean(MainContent.class);
-        
+        this.listaNocyHoteliService = SpringContextHolder.getContext().getBean(ListaNocyHoteliService.class);
+
+
         this.setOnAction(e -> onClick());
     }
 
-    private void onClick(){
-
+    public void onClick() {
         Pokoje pokoj = wybierzPokoj();
+        if (pokoj == null) return;
 
-        if(pokoj == null) return;
+        // Pobranie danych widoku ListaNocyHoteli dla wybranego pokoju
+        List<ListaNocyHoteli> listaNocyHoteli = listaNocyHoteliService.getListyByPokoj(pokoj);
 
-        BorderPane borderPane = new BorderPane();
-        borderPane.setStyle("-fx-background-color: #fff");
-
-        // Ustawienie nazwy wycieczki
-
-        VBox clientsVBox = new VBox(10);
-        Label labelWycieczka = new Label(pokoj.getWycieczka().toString());
-        labelWycieczka.setStyle("-fx-font-size: 25px; -fx-font-weight: bold;");
-
-        Label infoLabel = new Label("(Dodatkowe noce są w tym samym hotelu co pierwsza/ostatni noc wycieczki)");
-        infoLabel.setStyle("-fx-font-size: 10px;");
-
-        clientsVBox.getChildren().addAll(labelWycieczka, infoLabel);
-
-        // Ustwianie klientow
-        List<Klienci> klienci = klienciService.getKlienciPokoju(pokoj);
-
-
-        for (Klienci klient : klienci) {
-
-            String dopiska = "";
-            if(klient.getNoclegPrzed()) dopiska = "(Nocleg przed) ";
-
-            if(klient.getNoclegPo()) dopiska += "(Nocleg po)";
-
-
-            Label labelKlient = new Label("Klient: " + klient.getImie() + " " + klient.getNazwisko() + " " + dopiska);
-            labelKlient.setStyle("-fx-font-size: 15px; -fx-font-weight: bold;");
-            clientsVBox.getChildren().add(labelKlient);
+        if (listaNocyHoteli.isEmpty()) {
+            showAlert(Alert.AlertType.INFORMATION, "Brak danych", "Dla wybranego pokoju nie ma danych do wyświetlenia.");
+            return;
         }
 
-        clientsVBox.setAlignment(Pos.TOP_LEFT);
-        BorderPane.setAlignment(clientsVBox, Pos.TOP_LEFT);
-        borderPane.setTop(clientsVBox);
+        // Tworzenie TableView
+        TableView<ListaNocyHoteli> tableView = new TableView<>();
 
+        // Kolumna: noc
+        TableColumn<ListaNocyHoteli, Integer> columnNoc = new TableColumn<>("Noc");
+        columnNoc.setCellValueFactory(data -> new javafx.beans.property.SimpleObjectProperty<>(data.getValue().getNoc()));
 
-        // Ustawianie listy hotel
-        List<ListyHoteli> listaHoteli = pokojeService.getListyHoteli(pokoj);
+        // Kolumna: data
+        TableColumn<ListaNocyHoteli, String> columnData = new TableColumn<>("Data");
+        columnData.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(
+                data.getValue().getData().toString()
+        ));
 
-        LocalDate dataNocy = pokoj.getWycieczka().getPoczatek();
+        // Kolumna: miasto
+        TableColumn<ListaNocyHoteli, String> columnMiasto = new TableColumn<>("Miasto");
+        columnMiasto.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(data.getValue().getMiasto()));
 
+        // Kolumna: hotel
+        TableColumn<ListaNocyHoteli, String> columnHotel = new TableColumn<>("Hotel");
+        columnHotel.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(data.getValue().getHotel()));
 
-        VBox hoteleVBox = new VBox(10);
-        for(int i = 0; i < listaHoteli.size(); i++){
-            MiastaWycieczek miastoWycieczki = listaHoteli.get(i).getMiastoWycieczki();
+        // Dodawanie kolumn do TableView
+        tableView.getColumns().addAll(columnNoc, columnData, columnMiasto, columnHotel);
 
-            Label listaLabel = new Label(Integer.toString(i + 1) + ".   " + dataNocy.plusDays(i).toString()
-                    + "   " + miastoWycieczki.getMiasta() + "   " + listaHoteli.get(i).getHotel().getNazwa());
+        // Ustawienie danych w TableView
+        tableView.getItems().addAll(listaNocyHoteli);
 
-            listaLabel.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: blue;");
-            hoteleVBox.getChildren().add(listaLabel);
-        }
-
-        hoteleVBox.setAlignment(Pos.CENTER_LEFT);
-        BorderPane.setAlignment(hoteleVBox, Pos.CENTER_LEFT);
-        borderPane.setCenter(hoteleVBox);
-
-
-        mainContent.updateForPane(borderPane);
+        // Aktualizacja widoku głównego
+        mainContent.updateContent(tableView);
     }
 
     private Pokoje wybierzPokoj(){
@@ -168,4 +144,5 @@ public class ListaHoteliShowButton extends Button{
             alert.showAndWait();
         });
     }
+
 }

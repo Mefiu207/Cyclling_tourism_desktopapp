@@ -1,5 +1,6 @@
 package com.project.springbootjavafx.repositories;
 
+import com.project.springbootjavafx.models.Klienci;
 import com.project.springbootjavafx.models.ListyHoteli;
 import com.project.springbootjavafx.models.Wycieczki;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -31,5 +32,8 @@ public interface PokojeRepository extends JpaRepository<Pokoje, Integer> {
 
     @Query(value = "SELECT l.* FROM listy_hoteli l JOIN miasta_wycieczek m ON l.miasto_wycieczki = m.id WHERE l.pokoj = :ID ORDER BY m.nr_nocy", nativeQuery = true)
     List<ListyHoteli> getListeHoteli(Integer ID);
+
+    @Query(value = "SELECT * FROM klienci k WHERE k.pokoj = :ID", nativeQuery = true)
+    List<Klienci> getKlienciPokoju(Integer ID);
 
 }

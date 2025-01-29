@@ -70,7 +70,7 @@ public class RightSidebar {
                         new RightDeletePokojButton("Usuń pokój", (CustomLeftButton<Pokoje, Integer>) activeButton),
                         new AddListaHoteliButton("Dodaj listę hoteli", activeButton),
                         new RightDeleteListaHoteliButton("Usuń listy hoteli", activeButton),
-                        new ListaHoteliShowButton("Pokaż listę hoteli")
+                        new ListaHoteliPokaż("Pokaż listę hoteli")
                 );
                 break;
 

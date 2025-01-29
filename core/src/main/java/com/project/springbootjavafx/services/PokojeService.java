@@ -1,6 +1,7 @@
 package com.project.springbootjavafx.services;
 
 
+import com.project.springbootjavafx.models.Klienci;
 import com.project.springbootjavafx.models.Pokoje;
 import com.project.springbootjavafx.models.ListyHoteli;
 import com.project.springbootjavafx.models.Wycieczki;
@@ -58,4 +59,6 @@ public class PokojeService extends AbstractServices<Pokoje, Integer>{
     }
 
 
+    // Zwraca klientow danego pokoju
+    public List<Klienci> getKlienci(Pokoje pokoj) { return repository.getKlienciPokoju(pokoj.getId()); }
 }
