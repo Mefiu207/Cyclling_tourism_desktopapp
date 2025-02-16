@@ -1,7 +1,7 @@
 
 package com.project.ui;
 
-import com.project.SpringBootConfig;
+
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -20,7 +20,7 @@ public class AppLayout extends Application {
 
     @Override
     public void init() throws Exception {
-        context = SpringApplication.run(SpringBootConfig.class);
+        context = SpringApplication.run(MainLauncher.class);
         context.getBean(SpringContextHolder.class);
         System.out.println("Spring Boot Application Started");
     }
