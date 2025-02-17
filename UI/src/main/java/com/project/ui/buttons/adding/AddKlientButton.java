@@ -1,19 +1,15 @@
 package com.project.ui.buttons.adding;
 
 import com.project.springbootjavafx.exceptions.WrongLetterException;
-
 import com.project.springbootjavafx.models.Ceny;
 import com.project.springbootjavafx.models.Klienci;
 import com.project.springbootjavafx.models.Pokoje;
 import com.project.springbootjavafx.models.Wycieczki;
-
 import com.project.springbootjavafx.services.KlienciService;
 import com.project.springbootjavafx.services.PokojeService;
 import com.project.springbootjavafx.services.WycieczkiService;
-
 import com.project.ui.SpringContextHolder;
 import com.project.ui.buttons.CustomLeftButton;
-
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -21,57 +17,131 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
-
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * The {@code AddKlientButton} class extends {@link Button} and provides functionality
+ * for adding a new client (Klienci) to the system.
+ *
+ * <p>
+ * When this button is clicked, a series of dialogs are presented to the user:
+ * </p>
+ * <ol>
+ *   <li>
+ *     The first dialog collects the client's personal data: first name (imie), last name (nazwisko),
+ *     and the associated trip (Wycieczki). The trip selection uses an auto-completing {@link ComboBox}.
+ *   </li>
+ *   <li>
+ *     If the first dialog is successfully completed, the second dialog allows the user to select an available room (Pokoje)
+ *     for the chosen trip. The available rooms are those that are not yet fully occupied.
+ *   </li>
+ *   <li>
+ *     If a room is selected, a third dialog is displayed where the user can select additional services
+ *     (e.g. discount, bicycle, E-Bike, extra nights before/after, half board (HB)) via checkboxes.
+ *   </li>
+ * </ol>
+ *
+ * <p>
+ * After collecting all necessary data, a new {@link Klienci} object is created, the payable amount is calculated
+ * based on the room type and selected services (using pricing information from {@link Ceny}), and the client is added to the database.
+ * Upon successful addition, the left sidebar is refreshed and an information alert is shown.
+ * </p>
+ *
+ * <p>
+ * The required services ({@link WycieczkiService}, {@link PokojeService}, and {@link KlienciService})
+ * are retrieved from the Spring context via {@link SpringContextHolder}. The {@code CustomLeftButton}
+ * passed in the constructor is used to refresh the view after adding the client.
+ * </p>
+ */
 public class AddKlientButton extends Button {
 
+    /**
+     * Service for managing trips.
+     */
     private final WycieczkiService wycieczkiService;
+
+    /**
+     * Service for managing rooms.
+     */
     private final PokojeService pokojeService;
+
+    /**
+     * Service for managing clients.
+     */
     private final KlienciService klienciService;
+
+    /**
+     * Reference to the left sidebar button used to refresh the view after adding a client.
+     */
     private final CustomLeftButton<?, ?> leftButton;
 
-
-    
+    /**
+     * Constructs a new {@code AddKlientButton} with the specified text and associated left sidebar button.
+     *
+     * @param name       the text to display on the button
+     * @param leftButton the left sidebar button that provides context and services for client operations
+     */
     public AddKlientButton(String name, CustomLeftButton<?, ?> leftButton) {
         super(name);
-
         this.leftButton = leftButton;
         this.wycieczkiService = SpringContextHolder.getContext().getBean(WycieczkiService.class);
         this.pokojeService = SpringContextHolder.getContext().getBean(PokojeService.class);
         this.klienciService = SpringContextHolder.getContext().getBean(KlienciService.class);
-
         this.setOnAction(e -> onClick());
     }
 
+    /**
+     * Handles the click event for this button.
+     *
+     * <p>
+     * This method initiates a sequence of dialogs:
+     * </p>
+     * <ol>
+     *   <li>
+     *     The first dialog collects the client's first name, last name, and a trip selection.
+     *     The trip selection is done using an editable {@link ComboBox} with auto-completion.
+     *     If any field is missing, an error alert is shown.
+     *   </li>
+     *   <li>
+     *     Upon successful input, the second dialog is shown to allow the user to select a room (Pokoje)
+     *     associated with the chosen trip that has available space.
+     *   </li>
+     *   <li>
+     *     If a room is selected, the third dialog is displayed for choosing additional services
+     *     (discount, bicycle, E-Bike, extra nights before, extra nights after, HB) using checkboxes.
+     *   </li>
+     *   <li>
+     *     Finally, a new {@link Klienci} object is created, pricing is calculated based on the selected room and services,
+     *     and the client is added to the database. The left sidebar is refreshed and a success alert is displayed.
+     *   </li>
+     * </ol>
+     */
     public void onClick() {
-
-
-        // Tworzenie pierwszego dialogu do wprowadzenia danych klienta
+        // Create the first dialog to collect client's personal data
         Dialog<Boolean> dialog = new Dialog<>();
         dialog.setTitle("Dodaj Nowego Klienta");
         dialog.setHeaderText("Wprowadź dane nowego klienta.");
 
-        // Ustawienie przycisków
+        // Set dialog buttons
         ButtonType nextButtonType = new ButtonType("Dalej", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(nextButtonType, ButtonType.CANCEL);
 
-        // Tworzenie formularza
+        // Create the form grid for the first dialog
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
 
-        // Pola formularza
+        // Form fields
         TextField imieField = new TextField();
         imieField.setPromptText("Imię");
 
         TextField nazwiskoField = new TextField();
         nazwiskoField.setPromptText("Nazwisko");
 
-        // Pole wyboru wycieczki z autouzupełnianiem
+        // Create an editable ComboBox for selecting a trip with auto-completion
         ComboBox<Wycieczki> wycieczkiComboBox = new ComboBox<>();
         wycieczkiComboBox.setEditable(true);
         List<Wycieczki> wycieczkiList = wycieczkiService.getAll();
@@ -79,7 +149,7 @@ public class AddKlientButton extends Button {
         wycieczkiComboBox.setItems(observableWycieczki);
         wycieczkiComboBox.setPromptText("Wybierz lub wpisz wycieczkę");
 
-        // Ustawienie konwertera, aby ComboBox poprawnie wyświetlał nazwy wycieczek
+        // Set converter to correctly display trip names in the ComboBox
         wycieczkiComboBox.setConverter(new StringConverter<Wycieczki>() {
             @Override
             public String toString(Wycieczki wycieczki) {
@@ -95,21 +165,7 @@ public class AddKlientButton extends Button {
             }
         });
 
-        // Implementacja autouzupełniania
-        wycieczkiComboBox.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
-            if (newValue == null || newValue.isEmpty()) {
-                wycieczkiComboBox.hide();
-                wycieczkiComboBox.setItems(observableWycieczki);
-            } else {
-                List<Wycieczki> filtered = wycieczkiList.stream()
-                        .filter(wycieczka -> wycieczka.toString().toLowerCase().contains(newValue.toLowerCase()))
-                        .collect(Collectors.toList());
-                wycieczkiComboBox.setItems(FXCollections.observableArrayList(filtered));
-                wycieczkiComboBox.show();
-            }
-        });
-
-        // Dodanie pól do gridu
+        // Add form fields to the grid
         grid.add(new Label("Imię:"), 0, 0);
         grid.add(imieField, 1, 0);
         grid.add(new Label("Nazwisko:"), 0, 1);
@@ -119,51 +175,49 @@ public class AddKlientButton extends Button {
 
         dialog.getDialogPane().setContent(grid);
 
-        // Ustawienie fokusu na pierwszym polu
+        // Set initial focus to the first field
         Platform.runLater(imieField::requestFocus);
 
-        // Obsługa przycisku "Dalej"
+        // Handle the "Dalej" button: validate fields and return true if valid
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == nextButtonType) {
                 String imie = imieField.getText().trim();
                 String nazwisko = nazwiskoField.getText().trim();
                 Wycieczki wycieczka = wycieczkiComboBox.getValue();
 
-                // Walidacja pól
+                // Validate that all fields are filled
                 if (imie.isEmpty() || nazwisko.isEmpty() || wycieczka == null) {
                     showAlert(Alert.AlertType.ERROR, "Błąd", "Wszystkie pola muszą być wypełnione.");
                     return false;
                 }
-
-                return true; // Return null because we handle dialogs sequentially
+                return true; // Continue to next dialog
             }
             return false;
         });
 
-        // Wyświetlenie pierwszego dialogu i obsługa wyniku
+        // Show the first dialog and check the result
         Optional<Boolean> result = dialog.showAndWait();
 
         if (result.isPresent() && result.get()) {
-        // Przechowywanie danych tymczasowych
+            // Temporarily store the client's data
             String tempImie = imieField.getText().trim();
             String tempNazwisko = nazwiskoField.getText().trim();
             Wycieczki tempWycieczka = wycieczkiComboBox.getValue();
 
-            // Tworzenie drugiego dialogu do wyboru pokoju
+            // Create the second dialog to choose a room
             Dialog<Void> roomDialog = new Dialog<>();
             roomDialog.setTitle("Wybierz Pokój");
             roomDialog.setHeaderText("Wybierz pokój dla klienta.");
 
-            // Ustawienie przycisków
+            // Set dialog buttons for room selection
             ButtonType nextRoomButtonType = new ButtonType("Dalej", ButtonBar.ButtonData.OK_DONE);
             roomDialog.getDialogPane().getButtonTypes().addAll(nextRoomButtonType, ButtonType.CANCEL);
 
-            // Pobranie dostępnych pokoi dla wybranej wycieczki
+            // Retrieve available rooms for the selected trip that have available space
             List<Pokoje> dostepnePokoje = pokojeService.getAll().stream()
                     .filter(pokoj -> pokoj.getWycieczka().equals(tempWycieczka))
                     .filter(pokoj -> pokoj.getIlKlientow() < pokoj.getIlMiejsc())
                     .collect(Collectors.toList());
-
 
             if (dostepnePokoje.isEmpty()) {
                 showAlert(Alert.AlertType.INFORMATION, "Brak Dostępnych Pokoi",
@@ -171,14 +225,14 @@ public class AddKlientButton extends Button {
                 return;
             }
 
-            // Tworzenie ListView do wyboru pokoju
+            // Create a ListView for room selection
             ListView<Pokoje> pokojeListView = new ListView<>();
             ObservableList<Pokoje> observablePokoje = FXCollections.observableArrayList(dostepnePokoje);
             pokojeListView.setItems(observablePokoje);
-            pokojeListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE); // Tylko jeden wybór
+            pokojeListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
             pokojeListView.setPrefHeight(150);
 
-            // Ustawienie konwertera, aby ListView poprawnie wyświetlał pokój
+            // Set cell factory to display room information
             pokojeListView.setCellFactory(param -> new ListCell<>() {
                 @Override
                 protected void updateItem(Pokoje pokoj, boolean empty) {
@@ -186,7 +240,7 @@ public class AddKlientButton extends Button {
                     if (empty || pokoj == null) {
                         setText(null);
                     } else {
-                        setText("Typ: " + pokoj.getTypPokoju());
+                        setText("Pokój: " + pokoj.getId() + " (" + pokoj.getTypPokoju() + ")");
                     }
                 }
             });
@@ -196,11 +250,9 @@ public class AddKlientButton extends Button {
             roomContent.getChildren().addAll(new Label("Wybierz pokój:"), pokojeListView);
 
             roomDialog.getDialogPane().setContent(roomContent);
-
-            // Ustawienie fokusu na ListView
             Platform.runLater(pokojeListView::requestFocus);
 
-            // Obsługa przycisku "Dalej" w drugim dialogu
+            // Handle the room selection dialog result
             roomDialog.setResultConverter(dialogButtonRoom -> {
                 if (dialogButtonRoom == nextRoomButtonType) {
                     Pokoje selectedPokoj = pokojeListView.getSelectionModel().getSelectedItem();
@@ -209,16 +261,16 @@ public class AddKlientButton extends Button {
                         return null;
                     }
 
-                    // Tworzenie trzeciego dialogu do wyboru dodatkowych usług
+                    // Create the third dialog to select additional services for the client
                     Dialog<Void> servicesDialog = new Dialog<>();
                     servicesDialog.setTitle("Dodatkowe Usługi");
                     servicesDialog.setHeaderText("Wybierz, z których usług korzysta klient.");
 
-                    // Ustawienie przycisków
+                    // Set dialog buttons for additional services
                     ButtonType addServicesButtonType = new ButtonType("Dodaj", ButtonBar.ButtonData.OK_DONE);
                     servicesDialog.getDialogPane().getButtonTypes().addAll(addServicesButtonType, ButtonType.CANCEL);
 
-                    // Tworzenie checkboxów
+                    // Create checkboxes for each additional service
                     CheckBox ulgaCheckBox = new CheckBox("Ulga");
                     CheckBox rowerCheckBox = new CheckBox("Rower");
                     CheckBox eBikeCheckBox = new CheckBox("E-Bike");
@@ -233,11 +285,9 @@ public class AddKlientButton extends Button {
                     );
 
                     servicesDialog.getDialogPane().setContent(servicesContent);
-
-                    // Ustawienie fokusu na pierwszym checkboxie
                     Platform.runLater(() -> ulgaCheckBox.requestFocus());
 
-                    // Obsługa przycisku "Dodaj" w trzecim dialogu
+                    // Handle the additional services dialog result
                     servicesDialog.setResultConverter(dialogButtonServices -> {
                         if (dialogButtonServices == addServicesButtonType) {
                             boolean ulga = ulgaCheckBox.isSelected();
@@ -247,7 +297,7 @@ public class AddKlientButton extends Button {
                             boolean noclegPo = noclegPoCheckBox.isSelected();
                             boolean hb = hbCheckBox.isSelected();
 
-                            // Tworzenie obiektu Klienci
+                            // Create a new Klienci (client) object and set its properties
                             Klienci klient = new Klienci();
                             klient.setImie(tempImie);
                             klient.setNazwisko(tempNazwisko);
@@ -262,11 +312,10 @@ public class AddKlientButton extends Button {
                             klient.setTypPokoju(selectedPokoj.getTypPokoju());
                             klient.setDoZaplaty(BigDecimal.valueOf(0));
 
-
-                            // Ceny wycieczki na której jest klient
+                            // Calculate the payable amount based on room type and selected services
                             Ceny ceny = klient.getWycieczka().getTypWycieczki().getCeny();
 
-                            switch(selectedPokoj.getIlMiejsc()){
+                            switch (selectedPokoj.getIlMiejsc()) {
                                 case 1:
                                     klient.setDoZaplaty(ceny.getPok_1().add(klient.getDoZaplaty()));
                                     break;
@@ -281,64 +330,69 @@ public class AddKlientButton extends Button {
                                     break;
                             }
 
-                            if(klient.getUlga()){
-                                Double val = klient.getDoZaplaty().intValue() * (ceny.getUlga_dziecko() - 100)/100.0;
+                            if (klient.getUlga()) {
+                                Double val = klient.getDoZaplaty().intValue() * (ceny.getUlga_dziecko() - 100) / 100.0;
                                 klient.setDoZaplaty(BigDecimal.valueOf(val));
                             }
 
-                            if(klient.getRower()){
+                            if (klient.getRower()) {
                                 klient.setDoZaplaty(klient.getDoZaplaty().add(ceny.getRower()));
                             }
 
-                            if(klient.getEBike()){
+                            if (klient.getEBike()) {
                                 klient.setDoZaplaty(klient.getDoZaplaty().add(ceny.getE_bike()));
                             }
 
-                            if(klient.getNoclegPo()){
+                            if (klient.getNoclegPo()) {
                                 klient.setDoZaplaty(klient.getDoZaplaty().add(ceny.getDodatkowa_noc()));
                             }
 
-                            if(klient.getNoclegPrzed()){
+                            if (klient.getNoclegPrzed()) {
                                 klient.setDoZaplaty(klient.getDoZaplaty().add(ceny.getDodatkowa_noc()));
                             }
 
-                            if(klient.getHb()){
+                            if (klient.getHb()) {
                                 klient.setDoZaplaty(klient.getDoZaplaty().add(ceny.getHb()));
                             }
 
-                            // Zapisanie klienta w bazie danych
+                            // Save the client to the database
                             try {
                                 klienciService.add(klient);
                                 leftButton.onClick();
-
                                 showAlert(Alert.AlertType.INFORMATION, "Sukces", "Klient został dodany pomyślnie.");
-
-
-
                             } catch (WrongLetterException ex) {
                                 showAlert(Alert.AlertType.ERROR, "Błąd", "Wystąpił problem: " + ex.getMessage());
                             } catch (Exception ex) {
                                 showAlert(Alert.AlertType.ERROR, "Błąd", "Wystąpił nieoczekiwany problem: " + ex.getMessage());
                             }
-
                             return null;
                         }
                         return null;
                     });
 
-                    // Wyświetlenie trzeciego dialogu
+                    // Show the third dialog (additional services)
                     servicesDialog.showAndWait();
                     return null;
                 }
                 return null;
             });
 
-            // Wyświetlenie drugiego dialogu
+            // Show the second dialog (room selection)
             roomDialog.showAndWait();
         }
     }
 
-
+    /**
+     * Displays an alert dialog with the specified type, title, and message.
+     *
+     * <p>
+     * This method ensures that the alert is displayed on the JavaFX Application Thread using {@link Platform#runLater(Runnable)}.
+     * </p>
+     *
+     * @param alertType the type of alert to display
+     * @param title     the title of the alert dialog
+     * @param message   the message to display in the alert dialog
+     */
     private void showAlert(Alert.AlertType alertType, String title, String message) {
         Platform.runLater(() -> {
             Alert alert = new Alert(alertType);
@@ -348,5 +402,4 @@ public class AddKlientButton extends Button {
             alert.showAndWait();
         });
     }
-
 }

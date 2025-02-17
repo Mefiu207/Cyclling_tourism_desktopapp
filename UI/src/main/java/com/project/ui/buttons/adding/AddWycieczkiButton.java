@@ -12,11 +12,33 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
-
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+/**
+ * The {@code AddWycieczkiButton} class extends {@link Button} and provides functionality for adding a new trip.
+ *
+ * <p>
+ * When this button is clicked, it opens a dialog that allows the user to enter details for a new trip.
+ * The user must provide:
+ * </p>
+ * <ul>
+ *   <li>The trip name via a text field.</li>
+ *   <li>A trip type via a combo box, populated with available {@link TypyWycieczek} entries.</li>
+ *   <li>A start date via a {@link DatePicker}.</li>
+ * </ul>
+ *
+ * <p>
+ * The end date is automatically calculated by adding the number of nights (as defined in the selected trip type)
+ * to the start date. If all fields are valid, a new {@link Wycieczki} object is created and added via
+ * {@link WycieczkiService}. Upon successful addition, a success alert is displayed and the left sidebar is refreshed
+ * by calling {@code onClick()} on the associated {@link CustomLeftButton}.
+ * </p>
+ *
+ * <p>
+ * The required services are obtained from the Spring context via {@link SpringContextHolder}.
+ * </p>
+ */
 public class AddWycieczkiButton extends Button {
 
     private AbstractServices<TypyWycieczek, String> typyWycieczekService;
@@ -24,43 +46,61 @@ public class AddWycieczkiButton extends Button {
     private final CustomLeftButton<?, ?> leftButton;
 
     /**
-     * Konstruktor klasy AddWycieczkiButton
+     * Constructs a new {@code AddWycieczkiButton} with the specified button text and associated left sidebar button.
      *
-     * @param name Nazwa przycisku
+     * @param name       the text to display on the button
+     * @param leftButton the left sidebar button that provides context and services for trip operations
      */
     public AddWycieczkiButton(String name, CustomLeftButton<?, ?> leftButton) {
         super(name);
-
         this.typyWycieczekService = SpringContextHolder.getContext().getBean(TypyWycieczekService.class);
         this.wycieczkiService = SpringContextHolder.getContext().getBean(WycieczkiService.class);
         this.leftButton = leftButton;
-
         this.setOnAction(e -> onClick());
     }
 
     /**
-     * Metoda obsługująca kliknięcie przycisku.
-     * Otwiera dialog do dodania nowej wycieczki.
+     * Handles the click event for this button.
+     *
+     * <p>
+     * When the button is clicked, a dialog is displayed for adding a new trip. The dialog collects:
+     * </p>
+     * <ul>
+     *   <li>A trip name from a text field.</li>
+     *   <li>A trip type selected from a combo box populated with available {@link TypyWycieczek} entries.</li>
+     *   <li>A start date using a {@link DatePicker}.</li>
+     * </ul>
+     *
+     * <p>
+     * The end date is automatically computed by adding the number of nights (from the selected trip type)
+     * to the start date. If any field is missing, an error alert is displayed. Otherwise, a new {@link Wycieczki}
+     * object is created and returned as the result of the dialog.
+     * </p>
+     *
+     * <p>
+     * Upon successful dialog completion, the new trip is added via {@link WycieczkiService} and a success alert is shown.
+     * The left sidebar is then refreshed by invoking {@code onClick()} on the associated {@link CustomLeftButton}.
+     * </p>
      */
     private void onClick() {
-        // Pobranie instancji MainContent z kontekstu Spring
+        // Retrieve the MainContent instance from the Spring context.
         MainContent mainContent = SpringContextHolder.getContext().getBean(MainContent.class);
 
-        // Tworzenie dialogu
+        // Create the dialog for adding a new trip.
         Dialog<Wycieczki> dialog = new Dialog<>();
         dialog.setTitle("Dodaj Nową Wycieczkę");
         dialog.setHeaderText("Wprowadź dane nowej wycieczki.");
 
-        // Ustawienie przycisków
+        // Set up dialog buttons.
         ButtonType addButtonType = new ButtonType("Dodaj", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(addButtonType, ButtonType.CANCEL);
 
-        // Tworzenie formularza
+        // Create a grid to hold form fields.
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
 
-        // Pola formularza
+        // Create form fields.
         TextField wycieczkaField = new TextField();
         wycieczkaField.setPromptText("Nazwa Wycieczki");
 
@@ -71,8 +111,7 @@ public class AddWycieczkiButton extends Button {
         DatePicker poczatekDatePicker = new DatePicker();
         poczatekDatePicker.setPromptText("Data Początku");
 
-
-        // Dodanie pól do gridu
+        // Add labels and fields to the grid.
         grid.add(new Label("Nazwa Wycieczki:"), 0, 0);
         grid.add(wycieczkaField, 1, 0);
         grid.add(new Label("Typ Wycieczki:"), 0, 1);
@@ -80,23 +119,22 @@ public class AddWycieczkiButton extends Button {
         grid.add(new Label("Data Początku:"), 0, 2);
         grid.add(poczatekDatePicker, 1, 2);
 
-
         dialog.getDialogPane().setContent(grid);
 
-        // Ustawienie fokusu na pierwszym polu
+        // Set initial focus on the trip name field.
         Platform.runLater(() -> wycieczkaField.requestFocus());
 
-        // Konwersja wyniku dialogu na obiekt Wycieczki
+        // Convert the dialog result into a Wycieczki object.
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == addButtonType) {
                 String wycieczkaName = wycieczkaField.getText().trim();
                 TypyWycieczek selectedTyp = typWycieczkiComboBox.getValue();
                 LocalDate poczatek = poczatekDatePicker.getValue();
 
-                // Automatycznie ustawiamy datę końcową na podstawie długości danego typu wycieczki
+                // Automatically calculate the end date based on the trip type's duration.
                 LocalDate koniec = poczatekDatePicker.getValue().plusDays(typWycieczkiComboBox.getValue().getLiczba_nocy());
 
-                // Walidacja pól
+                // Validate that all fields are filled.
                 if (wycieczkaName.isEmpty() || selectedTyp == null || poczatek == null || koniec == null) {
                     showAlert(Alert.AlertType.ERROR, "Błąd", "Wszystkie pola muszą być wypełnione.");
                     return null;
@@ -110,7 +148,6 @@ public class AddWycieczkiButton extends Button {
                     wycieczka.setKoniec(koniec);
                     wycieczka.setIlUczestinkow(0);
                     wycieczka.setWplyw(BigDecimal.valueOf(0));
-
                     return wycieczka;
                 } catch (NumberFormatException ex) {
                     showAlert(Alert.AlertType.ERROR, "Błąd", "Liczba Uczestników musi być liczbą całkowitą, a Wpływ liczbą dziesiętną.");
@@ -120,15 +157,12 @@ public class AddWycieczkiButton extends Button {
             return null;
         });
 
-        // Obsługa wyniku dialogu
+        // Process the result of the dialog.
         dialog.showAndWait().ifPresent(wycieczka -> {
             try {
-                // Zapisanie wycieczki w bazie danych
                 wycieczkiService.add(wycieczka);
                 showAlert(Alert.AlertType.INFORMATION, "Sukces", "Wycieczka została dodana pomyślnie.");
-
                 leftButton.onClick();
-
             } catch (Exception e) {
                 showAlert(Alert.AlertType.ERROR, "Błąd", "Wystąpił problem podczas zapisywania wycieczki: " + e.getMessage());
             }
@@ -136,11 +170,16 @@ public class AddWycieczkiButton extends Button {
     }
 
     /**
-     * Metoda pomocnicza do wyświetlania alertów.
+     * Displays an alert dialog with the specified type, title, and message.
      *
-     * @param alertType Typ alertu
-     * @param title     Tytuł okna
-     * @param message   Wiadomość
+     * <p>
+     * This method ensures that the alert is displayed on the JavaFX Application Thread using
+     * {@link Platform#runLater(Runnable)}.
+     * </p>
+     *
+     * @param alertType the type of alert to display
+     * @param title     the title of the alert dialog
+     * @param message   the message to display in the alert dialog
      */
     private void showAlert(Alert.AlertType alertType, String title, String message) {
         Platform.runLater(() -> {
