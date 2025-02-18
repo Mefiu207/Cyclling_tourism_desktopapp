@@ -66,7 +66,7 @@ public class MiastaWycieczek implements Models {
      * This represents a one-to-many relationship with the {@link ListyHoteli} entity.
      * </p>
      */
-    @OneToMany(mappedBy = "miastoWycieczek")
+    @OneToMany(mappedBy = "miastoWycieczki")
     private List<ListyHoteli> listyHoteli;
 
     /**
